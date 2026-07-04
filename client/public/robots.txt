@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin
+Disallow: /admin/
+Disallow: /jobseeker-dashboard
+Disallow: /reset-password
+Disallow: /jobseeker-auth
+Disallow: /auth
+Disallow: /api/
+
+Sitemap: https://www.tilcons.com/sitemap.xml

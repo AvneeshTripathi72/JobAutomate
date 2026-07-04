@@ -1,0 +1,8 @@
+node_modules
+dist
+exports
+attached_assets
+.local
+.agents
+*.tar.gz
+*.zip
