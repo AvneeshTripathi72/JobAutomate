@@ -193,7 +193,25 @@ const PIPELINE: {
 ];
 
 type NavItem = { tab: AdminTab; label: string; icon: any; muted?: boolean };
-type Workspace = "admin" | "ats" | "crm";
+type Workspace = "admin" | "internal_crm";
+
+// Top-level category grouping: Website Admin vs. Internal CRM.
+// "admin" workspace (site content) lives under Website Admin.
+// ATS + CRM tabs are combined together under the single "internal_crm" workspace
+// (shown together, not as separate sub-tabs).
+type TopCategory = "website" | "internal_crm";
+
+const TOP_CATEGORY_META: Record<
+  TopCategory,
+  { label: string; workspaces: Workspace[] }
+> = {
+  website: { label: "Website Admin", workspaces: ["admin"] },
+  internal_crm: { label: "Internal CRM", workspaces: ["internal_crm"] },
+};
+
+function categoryForWorkspace(ws: Workspace): TopCategory {
+  return ws === "internal_crm" ? "internal_crm" : "website";
+}
 
 // ADMIN_NAV_ITEMS is built dynamically (see getAdminNavItems below)
 const ADMIN_NAV_BASE: NavItem[] = [
@@ -232,9 +250,14 @@ const CRM_NAV_ITEMS: NavItem[] = [
 
 // WORKSPACE_META items are injected per-role inside the Admin component
 // (use getWorkspaceMeta(role) below instead of accessing this directly)
-const _WORKSPACE_META_ATS_CRM = {
-  ats: { label: "ATS", defaultTab: "ats" as AdminTab, items: ATS_NAV_ITEMS },
-  crm: { label: "CRM", defaultTab: "crm" as AdminTab, items: CRM_NAV_ITEMS },
+// ATS + CRM nav items are combined into a single "internal_crm" workspace list
+// (shown together in one nav, not split into separate sub-tabs).
+const _WORKSPACE_META_INTERNAL_CRM = {
+  internal_crm: {
+    label: "Internal CRM",
+    defaultTab: "ats" as AdminTab,
+    items: [...ATS_NAV_ITEMS, ...CRM_NAV_ITEMS],
+  },
 };
 
 function getWorkspaceMeta(
@@ -249,13 +272,13 @@ function getWorkspaceMeta(
       defaultTab: "dashboard",
       items: getAdminNavItems(role),
     },
-    ..._WORKSPACE_META_ATS_CRM,
+    ..._WORKSPACE_META_INTERNAL_CRM,
   };
 }
 
 function workspaceForTab(tab: AdminTab): Workspace {
-  if (CRM_NAV_ITEMS.some((n) => n.tab === tab)) return "crm";
-  if (ATS_NAV_ITEMS.some((n) => n.tab === tab)) return "ats";
+  if (CRM_NAV_ITEMS.some((n) => n.tab === tab)) return "internal_crm";
+  if (ATS_NAV_ITEMS.some((n) => n.tab === tab)) return "internal_crm";
   return "admin";
 }
 
@@ -1283,6 +1306,7 @@ export default function Admin() {
     .sort((a, b) => b.count - a.count);
 
   const currentWorkspace: Workspace = workspaceForTab(activeTab);
+  const currentCategory: TopCategory = categoryForWorkspace(currentWorkspace);
   const workspaceMeta = getWorkspaceMeta(user?.role);
 
   // Sidebar component
@@ -1301,40 +1325,41 @@ export default function Admin() {
           className="text-white/40 text-[10px] uppercase tracking-widest mt-3 font-semibold"
           data-testid="text-workspace-label"
         >
-          Admin Workspace
+          {TOP_CATEGORY_META[currentCategory].label}
         </p>
       </div>
 
-      {/* Workspace switcher */}
+      {/* Top-level category switcher: Website Admin vs. Internal CRM */}
       <div className="px-3 pt-4 pb-2">
         <p className="text-[10px] uppercase tracking-widest text-white/30 font-bold px-2 pb-2">
-          Workspace
+          Panel
         </p>
-        <div className="grid grid-cols-3 gap-1.5">
-          {(["admin", "ats", "crm"] as Workspace[]).map((ws) => {
-            const isActive = currentWorkspace === ws;
+        <div className="grid grid-cols-2 gap-1.5">
+          {(["website", "internal_crm"] as TopCategory[]).map((cat) => {
+            const isActive = currentCategory === cat;
             return (
               <button
-                key={ws}
+                key={cat}
                 onClick={() => {
-                  setActiveTab(workspaceMeta[ws].defaultTab);
+                  const firstWs = TOP_CATEGORY_META[cat].workspaces[0];
+                  setActiveTab(workspaceMeta[firstWs].defaultTab);
                   setSidebarOpen(false);
                 }}
-                data-testid={`workspace-${ws}`}
-                className={`px-2 py-2 rounded-md text-xs font-bold uppercase tracking-wide transition-all ${
+                data-testid={`category-${cat}`}
+                className={`px-2 py-2.5 rounded-md text-xs font-bold uppercase tracking-wide transition-all ${
                   isActive
                     ? "bg-[#0ea5e9] text-white"
                     : "bg-white/5 text-white/60 hover:text-white hover:bg-white/10"
                 }`}
               >
-                {workspaceMeta[ws].label}
+                {TOP_CATEGORY_META[cat].label}
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Nav (current workspace items only) */}
+      {/* Nav (current workspace items only — ATS and CRM tabs are combined together here) */}
       <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto">
         {workspaceMeta[currentWorkspace].items.map(
           ({ tab, label, icon: Icon, muted }) => {
