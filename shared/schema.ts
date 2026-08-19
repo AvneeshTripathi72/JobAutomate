@@ -594,6 +594,54 @@ export const jobSeekerLoginSchema = z.object({
   password: z.string().min(1, "Password is required"),
 });
 
+// ─── VMS Sync ──────────────────────────────────────────────────────────────
+export const vmsConnections = pgTable("vms_connections", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  systemName: text("system_name").notNull(),
+  clientName: text("client_name").notNull(),
+  status: text("status").notNull().default("Pending"),
+  syncedRecords: integer("synced_records").notNull().default(0),
+  lastSyncAt: timestamp("last_sync_at"),
+  notes: text("notes"),
+  ownerUserId: varchar("owner_user_id").notNull(),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+});
+
+export const insertVmsConnectionSchema = createInsertSchema(vmsConnections).omit({
+  id: true,
+  createdAt: true,
+  ownerUserId: true,
+}).extend({
+  syncedRecords: z.number().int().min(0).default(0),
+  lastSyncAt: z.coerce.date().optional().nullable(),
+});
+export type InsertVmsConnection = z.infer<typeof insertVmsConnectionSchema>;
+export type VmsConnection = typeof vmsConnections.$inferSelect;
+
+// ─── Job Boards ────────────────────────────────────────────────────────────
+export const jobBoardPostings = pgTable("job_board_postings", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  jobTitle: text("job_title").notNull(),
+  board: text("board").notNull(),
+  status: text("status").notNull().default("Pending"),
+  applicantsCount: integer("applicants_count").notNull().default(0),
+  externalUrl: text("external_url"),
+  postedAt: timestamp("posted_at"),
+  ownerUserId: varchar("owner_user_id").notNull(),
+  createdAt: timestamp("created_at").notNull().default(sql`now()`),
+});
+
+export const insertJobBoardPostingSchema = createInsertSchema(jobBoardPostings).omit({
+  id: true,
+  createdAt: true,
+  ownerUserId: true,
+}).extend({
+  applicantsCount: z.number().int().min(0).default(0),
+  postedAt: z.coerce.date().optional().nullable(),
+});
+export type InsertJobBoardPosting = z.infer<typeof insertJobBoardPostingSchema>;
+export type JobBoardPosting = typeof jobBoardPostings.$inferSelect;
+
 export type InsertJob = z.infer<typeof insertJobSchema>;
 export type Job = typeof jobs.$inferSelect;
 export type InsertApplication = z.infer<typeof insertApplicationSchema>;

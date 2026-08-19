@@ -44,10 +44,16 @@ import {
   type UpdateJobSeeker,
   onboardings,
   invoices,
+  vmsConnections,
+  jobBoardPostings,
   type Onboarding,
   type InsertOnboarding,
   type Invoice,
   type InsertInvoice,
+  type VmsConnection,
+  type InsertVmsConnection,
+  type JobBoardPosting,
+  type InsertJobBoardPosting,
   esignatures,
   type ESignature,
   type InsertESignature,
@@ -182,6 +188,18 @@ export interface IStorage {
   createInvoice(input: InsertInvoice, ownerUserId: string): Promise<Invoice>;
   updateInvoice(id: string, ownerUserId: string, updates: Partial<InsertInvoice>): Promise<Invoice | undefined>;
   deleteInvoice(id: string, ownerUserId: string): Promise<boolean>;
+
+  // VMS Connections (scoped per owner)
+  getAllVmsConnections(ownerUserId: string): Promise<VmsConnection[]>;
+  createVmsConnection(input: InsertVmsConnection, ownerUserId: string): Promise<VmsConnection>;
+  updateVmsConnection(id: string, ownerUserId: string, updates: Partial<InsertVmsConnection>): Promise<VmsConnection | undefined>;
+  deleteVmsConnection(id: string, ownerUserId: string): Promise<boolean>;
+
+  // Job Board Postings (scoped per owner)
+  getAllJobBoardPostings(ownerUserId: string): Promise<JobBoardPosting[]>;
+  createJobBoardPosting(input: InsertJobBoardPosting, ownerUserId: string): Promise<JobBoardPosting>;
+  updateJobBoardPosting(id: string, ownerUserId: string, updates: Partial<InsertJobBoardPosting>): Promise<JobBoardPosting | undefined>;
+  deleteJobBoardPosting(id: string, ownerUserId: string): Promise<boolean>;
 
   // E-Signatures (scoped per owner)
   getAllESignatures(ownerUserId: string): Promise<ESignature[]>;
@@ -843,6 +861,52 @@ export class DatabaseStorage implements IStorage {
   async deleteOnboarding(id: string, ownerUserId: string): Promise<boolean> {
     return this.withDbWrite(async () => {
       const result = await db.delete(onboardings).where(and(eq(onboardings.id, id), eq(onboardings.ownerUserId, ownerUserId))).returning({ id: onboardings.id });
+      return result.length > 0;
+    });
+  }
+
+  // ─── VMS Connections ────────────────────────────────────────────────────
+  async getAllVmsConnections(ownerUserId: string): Promise<VmsConnection[]> {
+    return this.withDb(() => db.select().from(vmsConnections).where(eq(vmsConnections.ownerUserId, ownerUserId)).orderBy(desc(vmsConnections.createdAt)), []);
+  }
+  async createVmsConnection(input: InsertVmsConnection, ownerUserId: string): Promise<VmsConnection> {
+    return this.withDbWrite(async () => {
+      const [row] = await db.insert(vmsConnections).values({ ...input, ownerUserId }).returning();
+      return row;
+    });
+  }
+  async updateVmsConnection(id: string, ownerUserId: string, updates: Partial<InsertVmsConnection>): Promise<VmsConnection | undefined> {
+    return this.withDbWrite(async () => {
+      const [row] = await db.update(vmsConnections).set(updates).where(and(eq(vmsConnections.id, id), eq(vmsConnections.ownerUserId, ownerUserId))).returning();
+      return row;
+    });
+  }
+  async deleteVmsConnection(id: string, ownerUserId: string): Promise<boolean> {
+    return this.withDbWrite(async () => {
+      const result = await db.delete(vmsConnections).where(and(eq(vmsConnections.id, id), eq(vmsConnections.ownerUserId, ownerUserId))).returning({ id: vmsConnections.id });
+      return result.length > 0;
+    });
+  }
+
+  // ─── Job Board Postings ─────────────────────────────────────────────────
+  async getAllJobBoardPostings(ownerUserId: string): Promise<JobBoardPosting[]> {
+    return this.withDb(() => db.select().from(jobBoardPostings).where(eq(jobBoardPostings.ownerUserId, ownerUserId)).orderBy(desc(jobBoardPostings.createdAt)), []);
+  }
+  async createJobBoardPosting(input: InsertJobBoardPosting, ownerUserId: string): Promise<JobBoardPosting> {
+    return this.withDbWrite(async () => {
+      const [row] = await db.insert(jobBoardPostings).values({ ...input, ownerUserId }).returning();
+      return row;
+    });
+  }
+  async updateJobBoardPosting(id: string, ownerUserId: string, updates: Partial<InsertJobBoardPosting>): Promise<JobBoardPosting | undefined> {
+    return this.withDbWrite(async () => {
+      const [row] = await db.update(jobBoardPostings).set(updates).where(and(eq(jobBoardPostings.id, id), eq(jobBoardPostings.ownerUserId, ownerUserId))).returning();
+      return row;
+    });
+  }
+  async deleteJobBoardPosting(id: string, ownerUserId: string): Promise<boolean> {
+    return this.withDbWrite(async () => {
+      const result = await db.delete(jobBoardPostings).where(and(eq(jobBoardPostings.id, id), eq(jobBoardPostings.ownerUserId, ownerUserId))).returning({ id: jobBoardPostings.id });
       return result.length > 0;
     });
   }

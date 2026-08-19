@@ -70,7 +70,7 @@ import type {
   JobSeeker,
 } from "@shared/schema";
 import logoPath from "@assets/Top_Logo_Tilcons_SkyBlue.png";
-import AtsModule, {
+import {
   ATS_MODULE_KEYS,
   ATS_MODULE_META,
   type AtsModuleKey,
@@ -85,6 +85,8 @@ import EmailCalendarWorkspace from "@/components/admin/EmailCalendarWorkspace";
 import AiRecruiterModule from "@/components/admin/AiRecruiterModule";
 import OfferLetterGenerator from "@/components/admin/OfferLetterGenerator";
 import BulkEmailDialog from "@/components/admin/BulkEmailDialog";
+import VmsSyncWorkspace from "@/components/admin/VmsSyncWorkspace";
+import JobBoardsWorkspace from "@/components/admin/JobBoardsWorkspace";
 import {
   ActivityTimeline,
   InterviewsTab,
@@ -228,12 +230,12 @@ function getAdminNavItems(role?: string): NavItem[] {
   return ADMIN_NAV_BASE;
 }
 
-// Roadmap-preview ATS modules (still mocked) — onboarding, financials, etc.
+// Roadmap-preview ATS modules — all now backed by live data (see Admin render logic below).
 const ATS_ROADMAP_NAV_ITEMS: NavItem[] = ATS_MODULE_KEYS.map((k) => ({
   tab: k as AdminTab,
   label: ATS_MODULE_META[k].label,
   icon: ATS_MODULE_META[k].icon,
-  muted: ["vms-sync", "job-boards"].includes(k),
+  muted: false,
 }));
 
 const ATS_NAV_ITEMS: NavItem[] = [
@@ -1516,10 +1518,8 @@ export default function Admin() {
           {activeTab === "background-checks" && <BackgroundChecksWorkspace />}
           {activeTab === "email-calendar" && <EmailCalendarWorkspace />}
 
-          {/* ── ATS marketed-modules mock screens ── */}
-          {isAtsModule && ["vms-sync", "job-boards"].includes(activeTab) && (
-            <AtsModule moduleKey={activeTab as AtsModuleKey} />
-          )}
+          {activeTab === "vms-sync" && <VmsSyncWorkspace />}
+          {activeTab === "job-boards" && <JobBoardsWorkspace />}
 
           {/* ── Dashboard overview ── */}
           {activeTab === "dashboard" && (

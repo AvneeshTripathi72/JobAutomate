@@ -1,7 +1,7 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertJobSchema, insertApplicationSchema, insertContactSchema, insertResumeSchema, insertVendorSchema, insertJobSeekerSchema, updateJobSeekerSchema, jobSeekerLoginSchema, insertArticleSchema, forgotPasswordSchema, resetPasswordSchema, insertClientSchema, insertDealSchema, insertInterviewSchema, insertSubmissionSchema, insertActivitySchema, hotlistToggleSchema, APPLICATION_STATUSES, generateAssessmentInputSchema, scoreCandidateInputSchema, onboardCompanySchema, createCompanyUserSchema, type AiAssessmentQuestion, insertOnboardingSchema, insertInvoiceSchema, insertESignatureSchema, insertBackgroundCheckSchema, insertEmailSchema, insertMeetingSchema } from "@shared/schema";
+import { insertJobSchema, insertApplicationSchema, insertContactSchema, insertResumeSchema, insertVendorSchema, insertJobSeekerSchema, updateJobSeekerSchema, jobSeekerLoginSchema, insertArticleSchema, forgotPasswordSchema, resetPasswordSchema, insertClientSchema, insertDealSchema, insertInterviewSchema, insertSubmissionSchema, insertActivitySchema, hotlistToggleSchema, APPLICATION_STATUSES, generateAssessmentInputSchema, scoreCandidateInputSchema, onboardCompanySchema, createCompanyUserSchema, type AiAssessmentQuestion, insertOnboardingSchema, insertInvoiceSchema, insertESignatureSchema, insertBackgroundCheckSchema, insertEmailSchema, insertMeetingSchema, insertVmsConnectionSchema, insertJobBoardPostingSchema } from "@shared/schema";
 import OpenAI from "openai";
 import { ZodError } from "zod";
 import { sendResumeNotificationEmail, sendApplicationNotificationEmail, sendContactNotificationEmail, sendPasswordResetEmail, sendInterviewReminderEmail, sendBulkEmail } from "./email";
@@ -1625,6 +1625,84 @@ ${input.jdText}`;
     const ownerId = (req.user as any).id as string;
     const deleted = await storage.deleteOnboarding(req.params.id, ownerId);
     if (!deleted) return res.status(404).json({ error: "Onboarding not found" });
+    res.sendStatus(204);
+  });
+
+  // ── VMS Connections (scoped to authenticated owner) ─────────────────────
+  app.get("/api/vms-connections", requireAuth, async (req, res) => {
+    try {
+      const ownerId = (req.user as any).id as string;
+      res.json(await storage.getAllVmsConnections(ownerId));
+    } catch (err) { console.error(err); res.status(500).json({ error: "Failed to fetch VMS connections" }); }
+  });
+
+  app.post("/api/vms-connections", requireAuth, async (req, res) => {
+    try {
+      const ownerId = (req.user as any).id as string;
+      const data = insertVmsConnectionSchema.parse(req.body);
+      res.status(201).json(await storage.createVmsConnection(data, ownerId));
+    } catch (err) {
+      if (err instanceof ZodError) return res.status(400).json({ error: err.errors });
+      res.status(500).json({ error: "Failed to create VMS connection" });
+    }
+  });
+
+  app.patch("/api/vms-connections/:id", requireAuth, async (req, res) => {
+    try {
+      const ownerId = (req.user as any).id as string;
+      const data = insertVmsConnectionSchema.partial().parse(req.body);
+      const updated = await storage.updateVmsConnection(req.params.id, ownerId, data);
+      if (!updated) return res.status(404).json({ error: "VMS connection not found" });
+      res.json(updated);
+    } catch (err) {
+      if (err instanceof ZodError) return res.status(400).json({ error: err.errors });
+      res.status(500).json({ error: "Failed to update VMS connection" });
+    }
+  });
+
+  app.delete("/api/vms-connections/:id", requireAuth, async (req, res) => {
+    const ownerId = (req.user as any).id as string;
+    const deleted = await storage.deleteVmsConnection(req.params.id, ownerId);
+    if (!deleted) return res.status(404).json({ error: "VMS connection not found" });
+    res.sendStatus(204);
+  });
+
+  // ── Job Board Postings (scoped to authenticated owner) ──────────────────
+  app.get("/api/job-board-postings", requireAuth, async (req, res) => {
+    try {
+      const ownerId = (req.user as any).id as string;
+      res.json(await storage.getAllJobBoardPostings(ownerId));
+    } catch (err) { console.error(err); res.status(500).json({ error: "Failed to fetch job board postings" }); }
+  });
+
+  app.post("/api/job-board-postings", requireAuth, async (req, res) => {
+    try {
+      const ownerId = (req.user as any).id as string;
+      const data = insertJobBoardPostingSchema.parse(req.body);
+      res.status(201).json(await storage.createJobBoardPosting(data, ownerId));
+    } catch (err) {
+      if (err instanceof ZodError) return res.status(400).json({ error: err.errors });
+      res.status(500).json({ error: "Failed to create job board posting" });
+    }
+  });
+
+  app.patch("/api/job-board-postings/:id", requireAuth, async (req, res) => {
+    try {
+      const ownerId = (req.user as any).id as string;
+      const data = insertJobBoardPostingSchema.partial().parse(req.body);
+      const updated = await storage.updateJobBoardPosting(req.params.id, ownerId, data);
+      if (!updated) return res.status(404).json({ error: "Job board posting not found" });
+      res.json(updated);
+    } catch (err) {
+      if (err instanceof ZodError) return res.status(400).json({ error: err.errors });
+      res.status(500).json({ error: "Failed to update job board posting" });
+    }
+  });
+
+  app.delete("/api/job-board-postings/:id", requireAuth, async (req, res) => {
+    const ownerId = (req.user as any).id as string;
+    const deleted = await storage.deleteJobBoardPosting(req.params.id, ownerId);
+    if (!deleted) return res.status(404).json({ error: "Job board posting not found" });
     res.sendStatus(204);
   });
 
