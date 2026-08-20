@@ -9,21 +9,15 @@ import {
   Users,
   Building2,
   GitBranch,
-  Mail,
-  Phone,
   Calendar,
   BarChart3,
-  Target,
-  Workflow,
   ShieldCheck,
   Bot,
-  Linkedin,
   FileSearch,
   Zap,
   ArrowRight,
   CheckCircle2,
   Sparkles,
-  Database,
   Bell,
   Layers,
 } from "lucide-react";
@@ -42,97 +36,61 @@ const coreFeatures = [
     icon: Users,
     title: "Contact & Candidate Management",
     description:
-      "Centralised database of every candidate, client contact and decision-maker — fully searchable with custom fields, tags and history.",
+      "Centralised database of every candidate, client contact and decision-maker — fully searchable with tags and full activity history.",
   },
   {
     icon: Building2,
     title: "Account & Company Tracking",
     description:
-      "360° view of every client company: hierarchy, locations, open requirements, billing history and relationship health score.",
+      "360° view of every client company: contacts, open requirements, billing history and deal status in one screen.",
   },
   {
     icon: GitBranch,
     title: "Sales Pipeline & Deal Stages",
     description:
-      "Drag-and-drop kanban for opportunities — from lead to BD call to MSA signed. Forecast revenue with confidence.",
-  },
-  {
-    icon: Mail,
-    title: "Email & Outlook Sync",
-    description:
-      "Two-way sync with Outlook and Gmail. Every email, meeting and note auto-logged against the right contact.",
-  },
-  {
-    icon: Phone,
-    title: "Click-to-Call & VoIP Integration",
-    description:
-      "Dial from any contact card, auto-record calls, and capture call notes directly to the activity timeline.",
+      "Kanban board for opportunities — from lead to BD call to MSA signed. Track every deal's stage and value in real time.",
   },
   {
     icon: Bot,
-    title: "AI-Powered Lead Scoring",
+    title: "AI Candidate Scoring & Assessments",
     description:
-      "Agastya AI scores every lead by intent, fit and engagement so your BD team focuses on the highest-value accounts first.",
+      "AI-generated skill assessments and candidate-to-role fit scoring, so recruiters spend time on the strongest matches first.",
   },
   {
     icon: Calendar,
-    title: "Meeting & Task Scheduler",
+    title: "Internal Meeting & Task Scheduler",
     description:
-      "Inbuilt calendar with reminders, follow-up cadences and shared team views. Never miss a renewal or check-in.",
-  },
-  {
-    icon: Workflow,
-    title: "Automated Workflows",
-    description:
-      "Trigger emails, tasks and stage changes based on rules — onboarding sequences, MSA expiry alerts, candidate nurture journeys.",
+      "Built-in calendar and meeting log to keep interviews, client check-ins and follow-ups organised across the team.",
   },
   {
     icon: BarChart3,
     title: "Real-time Dashboards & Reports",
     description:
-      "Pipeline value, conversion ratios, activity scorecards, recruiter leaderboards — all in live, exportable dashboards.",
-  },
-  {
-    icon: FileSearch,
-    title: "Resume Parsing & Smart Search",
-    description:
-      "Upload thousands of CVs, AI extracts skills/experience automatically. Boolean and natural-language search across the entire database.",
-  },
-  {
-    icon: Linkedin,
-    title: "LinkedIn & Job-Board Integration",
-    description:
-      "One-click import from LinkedIn, Naukri, Monster, Indeed. Push roles out to multiple boards from a single screen.",
+      "Pipeline value, activity counts and recruiter scorecards — live, exportable reporting without spreadsheets.",
   },
   {
     icon: Bell,
     title: "Alerts & Activity Feed",
     description:
-      "Live notifications when candidates apply, clients reply or deals move stage. Stay in the loop without refreshing.",
+      "A live activity timeline logs every candidate submission, deal update and stage change against the right record.",
   },
   {
     icon: ShieldCheck,
     title: "Role-Based Access & Audit Trail",
     description:
-      "Granular permissions per recruiter, account manager or admin. Full audit log for compliance and IP protection.",
-  },
-  {
-    icon: Database,
-    title: "Custom Fields & Modules",
-    description:
-      "Configure the CRM around your workflow — add custom fields, statuses, tags and even build new modules without code.",
+      "Granular permissions per recruiter, account manager or super admin — with a full activity log for accountability.",
   },
   {
     icon: Layers,
-    title: "Vendor & Sub-contractor Tracking",
+    title: "Vendor & VMS Relationship Tracking",
     description:
-      "Manage your bench, sub-vendor partners and MSP relationships in one place with rate cards and compliance documents.",
+      "Track your VMS relationships (Beeline, Fieldglass, SAP and more) and job-board postings from one dashboard.",
   },
   {
-    icon: Target,
-    title: "Goals, KPIs & Commissions",
+    icon: FileSearch,
+    title: "Onboarding, E-Sign & Background Checks",
     description:
-      "Set monthly targets per recruiter or BD, track in real time and auto-calculate commissions on closed placements.",
+      "Move placed candidates through onboarding, document e-signature and background-check tracking without leaving the CRM.",
   },
 ];
 
@@ -141,31 +99,31 @@ const workflow = [
     step: "01",
     title: "Capture",
     description:
-      "Leads flow in from your website, LinkedIn, job boards, referrals and email — automatically de-duplicated and assigned.",
+      "Candidates and client leads flow in through your website, referrals and manual entry — organised and assigned instantly.",
   },
   {
     step: "02",
     title: "Qualify",
     description:
-      "Agastya AI scores and routes leads. Recruiters and BD reps see only the opportunities that matter to them today.",
+      "AI scoring and skill assessments highlight the strongest candidates so recruiters focus where it matters.",
   },
   {
     step: "03",
     title: "Engage",
     description:
-      "Multi-channel outreach (email, call, LinkedIn) tracked on a single timeline. Cadences keep follow-ups on autopilot.",
+      "Every call note, meeting and update lives on a single activity timeline against the candidate or client.",
   },
   {
     step: "04",
     title: "Close & Place",
     description:
-      "Move deals through the pipeline, attach the right candidate, generate offer letters and convert to billable placement.",
+      "Move deals through the pipeline, attach the right candidate, generate offer letters and convert to a billable placement.",
   },
   {
     step: "05",
     title: "Measure & Grow",
     description:
-      "Real-time dashboards show what's working. Double down on the channels, recruiters and accounts driving revenue.",
+      "Real-time dashboards show what's working. Double down on the recruiters and accounts driving revenue.",
   },
 ];
 
