@@ -142,7 +142,7 @@ const capabilities = [
   },
   {
     icon: Search,
-    title: "Patented Boolean + NL Search",
+    title: "Proprietary Boolean + NL Search",
     description:
       "Pinpoint the right consultant from millions of profiles in under a second using Boolean operators or plain-English natural language queries.",
     quarter: "Q4 2026",

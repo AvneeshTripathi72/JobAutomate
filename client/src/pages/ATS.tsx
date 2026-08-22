@@ -269,7 +269,7 @@ function AtsPipelinePreview() {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Patented search · e.g. Java AND (Spring OR Quarkus) AND Bangalore"
+            placeholder="Advanced search · e.g. Java AND (Spring OR Quarkus) AND Bangalore"
             className="pl-9 h-10 bg-card"
           />
         </div>
@@ -543,7 +543,7 @@ export default function ATS() {
           <SolutionSection key={s.id} section={s} />
         ))}
 
-        {/* Patented + AI-native trust strip */}
+        {/* Proprietary + AI-native trust strip */}
         <PatentedStrip />
 
         {/* Closing CTA — "Transform your staffing business" */}
@@ -621,7 +621,7 @@ function BusinessAdvantages() {
 function PatentedStrip() {
   const ref = useScrollReveal<HTMLElement>();
   const pills = [
-    "Patented Search Technology",
+    "Proprietary Search Technology",
     "Native AI — Agastya",
     "Built by recruiters, for recruiters",
     "Enterprise-grade Security",
@@ -638,7 +638,7 @@ function PatentedStrip() {
         <div className="flex items-center justify-center gap-2 mb-5">
           <Award className="h-5 w-5 text-sky-500" />
           <p className="text-sky-500 text-xs font-bold uppercase tracking-[0.25em]">
-            Patented & AI-native technology
+            Proprietary & AI-native technology
           </p>
         </div>
         <div className="flex flex-wrap items-center justify-center gap-2.5">
