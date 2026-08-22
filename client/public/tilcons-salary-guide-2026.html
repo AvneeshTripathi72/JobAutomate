@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tilcons 2026 Salary &amp; Hiring Guide</title>
+<meta name="description" content="Tilcons Salary & Hiring Guide 2026 — benchmark salaries, understand talent demand, and make smarter hiring and career decisions across 6 key sectors.">
+<link rel="icon" type="image/png" href="/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0F1F38;
+    --blue:#1B5A96;
+    --blue-deep:#123C66;
+    --orange:#E8672A;
+    --orange-tint:#FDEEE4;
+    --paper:#F7F9FC;
+    --paper-alt:#FFFFFF;
+    --slate:#5B6B85;
+    --line:#DCE3EE;
+    --up:#1C8A5A;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--navy);
+    font-family:'Inter',system-ui,-apple-system,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+  }
+  h1,h2,h3,.display{
+    font-family:'Space Grotesk',system-ui,sans-serif;
+    letter-spacing:-0.01em;
+    margin:0;
+  }
+  .mono{font-family:'IBM Plex Mono',ui-monospace,monospace;}
+  a{color:inherit;}
+  img{max-width:100%;display:block;}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 28px;}
+  @media (max-width:640px){.wrap{padding:0 18px;}}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    background:linear-gradient(165deg,var(--navy) 0%,var(--blue-deep) 62%,var(--blue) 100%);
+    color:#fff;
+    overflow:hidden;
+    padding:64px 0 84px;
+  }
+  .hero-year{
+    position:absolute;
+    top:-6vw;
+    right:-2vw;
+    font-family:'Space Grotesk',sans-serif;
+    font-weight:700;
+    font-size:min(46vw,520px);
+    line-height:1;
+    color:rgba(255,255,255,0.045);
+    letter-spacing:-0.04em;
+    pointer-events:none;
+    user-select:none;
+  }
+  .brand-row{
+    display:flex;align-items:center;gap:12px;
+    margin-bottom:56px;
+  }
+  .brand-mark{width:34px;height:34px;flex:0 0 auto;}
+  .brand-name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:19px;letter-spacing:0.01em;}
+  .brand-tag{font-size:12px;color:rgba(255,255,255,0.62);letter-spacing:0.04em;}
+
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;letter-spacing:0.12em;text-transform:uppercase;
+    color:var(--orange);
+    background:rgba(232,103,42,0.14);
+    border:1px solid rgba(232,103,42,0.35);
+    padding:6px 12px;border-radius:999px;
+    margin-bottom:22px;
+  }
+  .eyebrow::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--orange);}
+
+  .hero h1{
+    font-size:clamp(40px,6.4vw,74px);
+    font-weight:700;
+    line-height:0.98;
+    max-width:820px;
+  }
+  .hero h1 .accent{color:var(--orange);}
+  .hero p.lede{
+    max-width:560px;
+    margin-top:22px;
+    font-size:17px;
+    color:rgba(255,255,255,0.78);
+  }
+  .hero-stats{
+    display:grid;grid-template-columns:repeat(3,auto);
+    gap:40px;
+    margin-top:56px;
+  }
+  .hero-stat .num{
+    font-family:'Space Grotesk',sans-serif;font-weight:700;
+    font-size:clamp(26px,3.4vw,38px);color:#fff;
+  }
+  .hero-stat .num .unit{color:var(--orange);}
+  .hero-stat .label{
+    font-size:12px;color:rgba(255,255,255,0.6);
+    text-transform:uppercase;letter-spacing:0.08em;margin-top:4px;
+  }
+  @media (max-width:640px){
+    .hero-stats{grid-template-columns:repeat(3,1fr);gap:18px;}
+  }
+
+  /* ---------- SECTION SCAFFOLD ---------- */
+  section{padding:72px 0;}
+  .section-head{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    gap:24px;margin-bottom:36px;flex-wrap:wrap;
+  }
+  .kicker{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;letter-spacing:0.14em;text-transform:uppercase;
+    color:var(--blue);
+    display:flex;align-items:center;gap:10px;
+    margin-bottom:10px;
+  }
+  .kicker .idx{color:var(--orange);}
+  .section-head h2{font-size:clamp(26px,3.4vw,36px);font-weight:600;max-width:640px;}
+  .section-desc{color:var(--slate);font-size:15px;max-width:440px;}
+
+  /* ---------- SECTOR TABLE ---------- */
+  .sector{
+    border-top:1px solid var(--line);
+    padding-top:56px;
+  }
+  .sector:first-of-type{border-top:none;padding-top:0;}
+  .table-card{
+    background:var(--paper-alt);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+  }
+  table{width:100%;border-collapse:collapse;}
+  thead th{
+    text-align:left;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;letter-spacing:0.08em;text-transform:uppercase;
+    color:var(--slate);
+    padding:16px 20px;
+    border-bottom:1px solid var(--line);
+    background:var(--paper);
+    white-space:nowrap;
+  }
+  tbody td{
+    padding:16px 20px;
+    border-bottom:1px solid var(--line);
+    font-size:14.5px;
+    vertical-align:middle;
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:var(--paper);}
+  .role-name{font-weight:600;color:var(--navy);}
+  .exp{color:var(--slate);white-space:nowrap;}
+  .salary{font-family:'IBM Plex Mono',monospace;font-weight:600;white-space:nowrap;}
+  .growth{color:var(--up);font-weight:600;white-space:nowrap;}
+  .growth::before{content:"▲ ";}
+  .demand{
+    display:inline-block;padding:4px 10px;border-radius:999px;
+    font-size:11px;font-weight:600;letter-spacing:0.03em;white-space:nowrap;
+  }
+  .demand.very-high{background:var(--orange-tint);color:var(--orange);}
+  .demand.high{background:#E8F1FB;color:var(--blue);}
+  .demand.medium{background:#EEF1F6;color:var(--slate);}
+  @media (max-width:760px){
+    thead{display:none;}
+    table,tbody,tr,td{display:block;width:100%;}
+    tbody tr{padding:16px 18px;border-bottom:1px solid var(--line);}
+    tbody td{padding:3px 0;border:none;}
+    .role-name{font-size:15.5px;}
+    .exp::before{content:"Experience: ";color:var(--slate);}
+    .salary::before{content:"Salary: ";font-family:'Inter';font-weight:400;color:var(--slate);}
+    .growth::after{content:" YoY";font-family:'Inter';font-weight:400;}
+  }
+
+  /* ---------- INSIGHTS ---------- */
+  .insights-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+  }
+  @media (max-width:900px){.insights-grid{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:600px){.insights-grid{grid-template-columns:1fr;}}
+  .insight{
+    background:var(--paper-alt);
+    padding:28px 26px;
+  }
+  .insight .n{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;color:var(--orange);margin-bottom:14px;display:block;
+  }
+  .insight h3{font-size:17px;font-weight:600;margin-bottom:10px;}
+  .insight p{font-size:14px;color:var(--slate);margin:0;}
+
+  /* ---------- TIPS ---------- */
+  .tips-section{background:var(--navy);color:#fff;}
+  .tips-section .kicker{color:var(--orange);}
+  .tips-section .section-desc{color:rgba(255,255,255,0.6);}
+  .tip-list{display:flex;flex-direction:column;}
+  .tip{
+    display:grid;grid-template-columns:64px 1fr;gap:22px;
+    padding:26px 0;border-top:1px solid rgba(255,255,255,0.12);
+  }
+  .tip:last-child{border-bottom:1px solid rgba(255,255,255,0.12);}
+  .tip .tnum{
+    font-family:'Space Grotesk',sans-serif;font-weight:700;
+    font-size:30px;color:rgba(255,255,255,0.22);
+  }
+  .tip h3{font-size:16.5px;font-weight:600;margin-bottom:6px;}
+  .tip p{margin:0;font-size:14.5px;color:rgba(255,255,255,0.68);max-width:640px;}
+
+  /* ---------- CTA ---------- */
+  .cta{
+    background:linear-gradient(120deg,var(--orange) 0%,#F08748 100%);
+    border-radius:20px;
+    padding:48px 40px;
+    display:flex;align-items:center;justify-content:space-between;
+    gap:24px;flex-wrap:wrap;
+    color:#fff;
+  }
+  .cta h2{font-size:clamp(22px,2.6vw,30px);font-weight:600;max-width:460px;}
+  .cta p{margin:8px 0 0;color:rgba(255,255,255,0.9);font-size:14.5px;max-width:420px;}
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--navy);color:#fff;
+    padding:14px 24px;border-radius:10px;
+    font-weight:600;font-size:14.5px;text-decoration:none;
+    white-space:nowrap;
+    transition:transform .15s ease;
+  }
+  .btn:hover{transform:translateY(-2px);}
+
+  footer{padding:44px 0 56px;color:var(--slate);font-size:13px;}
+  footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;border-top:1px solid var(--line);padding-top:24px;}
+  footer a{color:var(--blue);text-decoration:none;}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-year" aria-hidden="true">26</div>
+  <div class="wrap">
+    <div class="brand-row">
+      <img class="brand-mark" src="data:image/png;base64,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" alt="Tilcons logo">
+      <div>
+        <div class="brand-name">Tilcons</div>
+        <div class="brand-tag">Connecting Talent</div>
+      </div>
+    </div>
+
+    <span class="eyebrow">Free resource · 2026 edition</span>
+    <h1>Salary &amp; Hiring<br>Guide <span class="accent">2026</span></h1>
+    <p class="lede">Benchmark salaries, understand talent demand, and make smarter hiring and career decisions across 6 key sectors — updated with the latest market data.</p>
+
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">6<span class="unit"></span></div><div class="label">Industries covered</div></div>
+      <div class="hero-stat"><div class="num">45<span class="unit">+</span></div><div class="label">Roles benchmarked</div></div>
+      <div class="hero-stat"><div class="num">350<span class="unit">+</span></div><div class="label">Placements made</div></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ================= SECTOR 01 ================= -->
+  <section id="sectors">
+    <div class="wrap">
+
+      <div class="sector">
+        <div class="kicker"><span class="idx">Sector 01</span></div>
+        <div class="section-head">
+          <h2>Technology &amp; IT</h2>
+          <p class="section-desc">Tech roles continue to command premium salaries. AI/ML, cloud, and cybersecurity talent remain the tightest markets going into 2026.</p>
+        </div>
+        <div class="table-card">
+          <table>
+            <thead><tr><th>Role</th><th>Experience</th><th>Annual salary (INR)</th><th>YoY growth</th><th>Demand</th></tr></thead>
+            <tbody>
+              <tr><td class="role-name">Software Engineer</td><td class="exp">2–5 yrs</td><td class="salary">₹9L – ₹20L</td><td class="growth">13%</td><td><span class="demand very-high">Very high</span></td></tr>
+              <tr><td class="role-name">Senior Software Engineer</td><td class="exp">5–9 yrs</td><td class="salary">₹21L – ₹40L</td><td class="growth">16%</td><td><span class="demand very-high">Very high</span></td></tr>
+              <tr><td class="role-name">Cloud / DevOps Engineer</td><td class="exp">3–7 yrs</td><td class="salary">₹14L – ₹33L</td><td class="growth">19%</td><td><span class="demand very-high">Very high</span></td></tr>
+              <tr><td class="role-name">Data Scientist</td><td class="exp">2–6 yrs</td><td class="salary">₹12L – ₹30L</td><td class="growth">21%</td><td><span class="demand very-high">Very high</span></td></tr>
+              <tr><td class="role-name">AI / ML Engineer</td><td class="exp">3–8 yrs</td><td class="salary">₹19L – ₹51L</td><td class="growth">29%</td><td><span class="demand very-high">Very high</span></td></tr>
+              <tr><td class="role-name">Cybersecurity Analyst</td><td class="exp">2–5 yrs</td><td class="salary">₹10L – ₹24L</td><td class="growth">23%</td><td><span class="demand very-high">Very high</span></td></tr>
+              <tr><td class="role-name">UI / UX Designer</td><td class="exp">2–5 yrs</td><td class="salary">₹7L – ₹17L</td><td class="growth">10%</td><td><span class="demand high">High</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ================= SECTOR 02 ================= -->
+      <div class="sector">
+        <div class="kicker"><span class="idx">Sector 02</span></div>
+        <div class="section-head">
+          <h2>Manufacturing</h2>
+          <p class="section-desc">Automation and robotics specialists remain the most sought-after profiles as factories continue investing in smart production lines.</p>
+        </div>
+        <div class="table-card">
+          <table>
+            <thead><tr><th>Role</th><th>Experience</th><th>Annual salary (INR)</th><th>YoY growth</th><th>Demand</th></tr></thead>
+            <tbody>
+              <tr><td class="role-name">Manufacturing Supervisor</td><td class="exp">4–8 yrs</td><td class="salary">₹6.5L – ₹13L</td><td class="growth">9%</td><td><span class="demand high">High</span></td></tr>
+              <tr><td class="role-name">Process Engineer</td><td class="exp">3–7 yrs</td><td class="salary">₹9L – ₹18L</td><td class="growth">12%</td><td><span class="demand high">High</span></td></tr>
+              <tr><td class="role-name">Quality Assurance Manager</td><td class="exp">5–10 yrs</td><td class="salary">₹11L – ₹22L</td><td class="growth">11%</td><td><span class="demand medium">Medium</span></td></tr>
+              <tr><td class="role-name">CNC Operator</td><td class="exp">2–5 yrs</td><td class="salary">₹3L – ₹7.5L</td><td class="growth">6%</td><td><span class="demand medium">Medium</span></td></tr>
+              <tr><td class="role-name">Automation / Robotics Engineer</td><td class="exp">3–7 yrs</td><td class="salary">₹12L – ₹26L</td><td class="growth">20%</td><td><span class="demand very-high">Very high</span></td></tr>
+              <tr><td class="role-name">Plant Manager</td><td class="exp">10+ yrs</td><td class="salary">₹19L – ₹37L</td><td class="growth">8%</td><td><span class="demand medium">Medium</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ================= SECTOR 03 ================= -->
+      <div class="sector">
+        <div class="kicker"><span class="idx">Sector 03</span></div>
+        <div class="section-head">
+          <h2>Healthcare</h2>
+          <p class="section-desc">Clinical and healthcare-technology roles command the highest premiums as demand for specialised care and diagnostics keeps rising.</p>
+        </div>
+        <div class="table-card">
+          <table>
+            <thead><tr><th>Role</th><th>Experience</th><th>Annual salary (INR)</th><th>YoY growth</th><th>Demand</th></tr></thead>
+            <tbody>
+              <tr><td class="role-name">Registered Nurse (ICU/CCU)</td><td class="exp">2–6 yrs</td><td class="salary">₹4.5L – ₹10L</td><td class="growth">15%</td><td><span class="demand very-high">Very high</span></td></tr>
+              <tr><td class="role-name">Medical Laboratory Technician</td><td class="exp">2–5 yrs</td><td class="salary">₹3.5L – ₹7.5L</td><td class="growth">10%</td><td><span class="demand high">High</span></td></tr>
+              <tr><td class="role-name">Radiologist Technician</td><td class="exp">3–6 yrs</td><td class="salary">₹4.5L – ₹11L</td><td class="growth">13%</td><td><span class="demand high">High</span></td></tr>
+              <tr><td class="role-name">Physiotherapist</td><td class="exp">2–5 yrs</td><td class="salary">₹4L – ₹9L</td><td class="growth">11%</td><td><span class="demand medium">Medium</span></td></tr>
+              <tr><td class="role-name">Healthcare Administrator</td><td class="exp">3–7 yrs</td><td class="salary">₹5.5L – ₹13L</td><td class="growth">9%</td><td><span class="demand medium">Medium</span></td></tr>
+              <tr><td class="role-name">Clinical Research Associate</td><td class="exp">2–5 yrs</td><td class="salary">₹6L – ₹16L</td><td class="growth">17%</td><td><span class="demand high">High</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ================= SECTOR 04 ================= -->
+      <div class="sector">
+        <div class="kicker"><span class="idx">Sector 04</span></div>
+        <div class="section-head">
+          <h2>Finance &amp; Accounting</h2>
+          <p class="section-desc">Demand for qualified CAs and CFAs stays robust. FinTech growth continues to push premium pay for finance professionals with technology skills.</p>
+        </div>
+        <div class="table-card">
+          <table>
+            <thead><tr><th>Role</th><th>Experience</th><th>Annual salary (INR)</th><th>YoY growth</th><th>Demand</th></tr></thead>
+            <tbody>
+              <tr><td class="role-name">Chartered Accountant (CA)</td><td class="exp">2–5 yrs</td><td class="salary">₹9L – ₹20L</td><td class="growth">11%</td><td><span class="demand high">High</span></td></tr>
+              <tr><td class="role-name">Financial Analyst</td><td class="exp">2–5 yrs</td><td class="salary">₹7L – ₹17L</td><td class="growth">13%</td><td><span class="demand high">High</span></td></tr>
+              <tr><td class="role-name">CFO</td><td class="exp">15+ yrs</td><td class="salary">₹43L – ₹1.1Cr+</td><td class="growth">9%</td><td><span class="demand medium">Medium</span></td></tr>
+              <tr><td class="role-name">Tax Manager</td><td class="exp">6–10 yrs</td><td class="salary">₹13L – ₹26L</td><td class="growth">10%</td><td><span class="demand medium">Medium</span></td></tr>
+              <tr><td class="role-name">Risk &amp; Compliance Manager</td><td class="exp">5–9 yrs</td><td class="salary">₹14L – ₹29L</td><td class="growth">16%</td><td><span class="demand high">High</span></td></tr>
+              <tr><td class="role-name">Bookkeeper</td><td class="exp">2–4 yrs</td><td class="salary">₹3L – ₹6.5L</td><td class="growth">6%</td><td><span class="demand medium">Medium</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ================= SECTOR 05 ================= -->
+      <div class="sector">
+        <div class="kicker"><span class="idx">Sector 05</span></div>
+        <div class="section-head">
+          <h2>Logistics &amp; Supply Chain</h2>
+          <p class="section-desc">E-commerce growth sustains high demand for logistics talent. Supply chain analysts with data skills remain especially sought after in 2026.</p>
+        </div>
+        <div class="table-card">
+          <table>
+            <thead><tr><th>Role</th><th>Experience</th><th>Annual salary (INR)</th><th>YoY growth</th><th>Demand</th></tr></thead>
+            <tbody>
+              <tr><td class="role-name">Warehouse Manager</td><td class="exp">5–10 yrs</td><td class="salary">₹6.5L – ₹15L</td><td class="growth">10%</td><td><span class="demand high">High</span></td></tr>
+              <tr><td class="role-name">Supply Chain Analyst</td><td class="exp">2–6 yrs</td><td class="salary">₹7L – ₹17L</td><td class="growth">14%</td><td><span class="demand high">High</span></td></tr>
+              <tr><td class="role-name">Logistics Coordinator</td><td class="exp">2–5 yrs</td><td class="salary">₹4.5L – ₹10L</td><td class="growth">9%</td><td><span class="demand medium">Medium</span></td></tr>
+              <tr><td class="role-name">Procurement Manager</td><td class="exp">6–10 yrs</td><td class="salary">₹11L – ₹24L</td><td class="growth">12%</td><td><span class="demand high">High</span></td></tr>
+              <tr><td class="role-name">Distribution Manager</td><td class="exp">7–12 yrs</td><td class="salary">₹13L – ₹26L</td><td class="growth">11%</td><td><span class="demand medium">Medium</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ================= SECTOR 06 ================= -->
+      <div class="sector">
+        <div class="kicker"><span class="idx">Sector 06</span></div>
+        <div class="section-head">
+          <h2>Administrative &amp; Office</h2>
+          <p class="section-desc">Executive assistant and office management roles keep evolving to include digital skills. Hybrid-ready, tech-proficient candidates command above-market pay.</p>
+        </div>
+        <div class="table-card">
+          <table>
+            <thead><tr><th>Role</th><th>Experience</th><th>Annual salary (INR)</th><th>YoY growth</th><th>Demand</th></tr></thead>
+            <tbody>
+              <tr><td class="role-name">Executive Assistant</td><td class="exp">3–7 yrs</td><td class="salary">₹5.5L – ₹13L</td><td class="growth">9%</td><td><span class="demand high">High</span></td></tr>
+              <tr><td class="role-name">Office Manager</td><td class="exp">4–8 yrs</td><td class="salary">₹6.5L – ₹15L</td><td class="growth">8%</td><td><span class="demand medium">Medium</span></td></tr>
+              <tr><td class="role-name">HR Manager</td><td class="exp">5–10 yrs</td><td class="salary">₹9L – ₹20L</td><td class="growth">12%</td><td><span class="demand high">High</span></td></tr>
+              <tr><td class="role-name">Receptionist</td><td class="exp">1–3 yrs</td><td class="salary">₹2.5L – ₹5.5L</td><td class="growth">6%</td><td><span class="demand medium">Medium</span></td></tr>
+              <tr><td class="role-name">Project Coordinator</td><td class="exp">2–5 yrs</td><td class="salary">₹5.5L – ₹12L</td><td class="growth">10%</td><td><span class="demand high">High</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ================= INSIGHTS ================= -->
+  <section id="insights">
+    <div class="wrap">
+      <div class="kicker"><span class="idx">Insights</span></div>
+      <div class="section-head">
+        <h2>Key hiring trends, 2026</h2>
+        <p class="section-desc">What every employer and job seeker needs to know as the year progresses.</p>
+      </div>
+      <div class="insights-grid">
+        <div class="insight">
+          <span class="n">01</span>
+          <h3>AI fluency is now a baseline</h3>
+          <p>AI proficiency has moved from differentiator to expectation across every sector. Candidates who can work fluently with AI tools command 18–28% salary premiums.</p>
+        </div>
+        <div class="insight">
+          <span class="n">02</span>
+          <h3>Skills-based hiring is the norm</h3>
+          <p>Degree requirements keep dropping in favour of demonstrated skills, portfolios, and certifications — the widest the talent pool has been in years.</p>
+        </div>
+        <div class="insight">
+          <span class="n">03</span>
+          <h3>Speed still wins the best talent</h3>
+          <p>Top candidates are typically off the market within 7–8 days in 2026. Streamlined, fast-moving hiring processes are now a decisive competitive edge.</p>
+        </div>
+        <div class="insight">
+          <span class="n">04</span>
+          <h3>Hybrid is the default, not the perk</h3>
+          <p>Over 75% of professionals rank hybrid working as a top-3 factor in evaluating a role. Rigid in-office mandates continue to cost employers top talent.</p>
+        </div>
+        <div class="insight">
+          <span class="n">05</span>
+          <h3>Salary expectations keep climbing</h3>
+          <p>Candidates across sectors benchmark against live market data and expect 12–22% increases when switching roles. Underbidding drives higher drop-out rates than ever.</p>
+        </div>
+        <div class="insight">
+          <span class="n">06</span>
+          <h3>DEI remains a real differentiator</h3>
+          <p>Organisations with visible, substantive DEI commitments attract more applications and see stronger offer-acceptance, especially among early-career candidates.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TIPS ================= -->
+  <section class="tips-section">
+    <div class="wrap">
+      <div class="kicker"><span class="idx">Best practices</span></div>
+      <div class="section-head">
+        <h2>7 tips to hire better in 2026</h2>
+        <p class="section-desc">Actionable advice from Tilcons consultants, based on 350+ successful placements.</p>
+      </div>
+      <div class="tip-list">
+        <div class="tip"><div class="tnum">01</div><div><h3>Define the role precisely before posting</h3><p>Vague job descriptions attract the wrong candidates and waste everyone's time. List must-have vs. nice-to-have skills clearly.</p></div></div>
+        <div class="tip"><div class="tnum">02</div><div><h3>Move fast at every stage</h3><p>Delay a day and you risk losing your best candidate. Aim to give feedback within 24 hours after each interview round.</p></div></div>
+        <div class="tip"><div class="tnum">03</div><div><h3>Benchmark your offer before making it</h3><p>Use this guide to ensure your compensation is at or above market — especially for high-demand, AI-adjacent roles.</p></div></div>
+        <div class="tip"><div class="tnum">04</div><div><h3>Sell the role and the company</h3><p>The best candidates have options. Articulate your culture, growth opportunities, and benefits clearly and compellingly.</p></div></div>
+        <div class="tip"><div class="tnum">05</div><div><h3>Think in total compensation</h3><p>Salary is just one element. Flexible working, learning budgets, ESOPs, and healthcare benefits are major decision factors in 2026.</p></div></div>
+        <div class="tip"><div class="tnum">06</div><div><h3>Involve a specialist recruiter early</h3><p>Access to a pre-screened talent pool cuts your time-to-hire by up to 60% and significantly improves quality of hire.</p></div></div>
+        <div class="tip"><div class="tnum">07</div><div><h3>Structure your onboarding</h3><p>The first 90 days are critical. A structured onboarding programme increases first-year retention by up to 82%.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CTA ================= -->
+  <section>
+    <div class="wrap">
+      <div class="cta">
+        <div>
+          <h2>Hiring in 2026, or exploring your next role?</h2>
+          <p>Talk to a Tilcons consultant and get a market-accurate benchmark for your exact role and location.</p>
+        </div>
+        <a class="btn" href="mailto:info@tilcons.com">Talk to Tilcons →</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <strong>Tilcons Staffing</strong> — <a href="mailto:info@tilcons.com">info@tilcons.com</a> · <a href="https://www.tilcons.com">www.tilcons.com</a>
+    </div>
+    <div>© 2026 Tilcons. All salary data is indicative and based on market benchmarks. Actual salaries may vary by location, company size, and candidate profile.</div>
+  </div>
+</footer>
+
+</body>
+</html>
