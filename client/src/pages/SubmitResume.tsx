@@ -95,10 +95,33 @@ export default function SubmitResume() {
       });
       setResumeFile(null);
     },
-    onError: () => {
+    onError: (error: any) => {
+      // apiRequest() throws `Error("<status>: <server message>")`.
+      // Surface the real reason instead of a generic message so we (and
+      // candidates) can actually diagnose failures like rate limits,
+      // validation errors, or file-size issues.
+      let description = "Failed to submit your application. Please try again.";
+      const raw = typeof error?.message === "string" ? error.message : "";
+      const match = raw.match(/^(\d{3}):\s*(.*)$/s);
+      if (match) {
+        const status = match[1];
+        let serverMsg = match[2]?.trim();
+        // Server errors are sometimes JSON: {"error":"..."}
+        try {
+          const parsed = JSON.parse(serverMsg);
+          if (parsed?.error) serverMsg = parsed.error;
+        } catch {
+          // not JSON, use as-is
+        }
+        if (status === "429") {
+          description = "Too many submissions from this network right now. Please wait a bit and try again.";
+        } else if (serverMsg) {
+          description = serverMsg;
+        }
+      }
       toast({
         title: "Submission failed",
-        description: "Failed to submit your application. Please try again.",
+        description,
         variant: "destructive",
       });
     },

@@ -10,12 +10,17 @@ declare module 'http' {
     rawBody: unknown
   }
 }
+// Resume uploads are sent as base64 JSON (~33% larger than the raw file,
+// plus JSON overhead). Our app-level check allows files up to 5MB, so the
+// body limit here must comfortably exceed that or Express rejects the
+// request with a 413 before our route/validation code ever runs.
 app.use(express.json({
+  limit: "10mb",
   verify: (req, _res, buf) => {
     req.rawBody = buf;
   }
 }));
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: false, limit: "10mb" }));
 
 app.use((req, res, next) => {
   const start = Date.now();
