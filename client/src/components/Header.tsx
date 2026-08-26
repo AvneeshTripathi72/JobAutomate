@@ -235,38 +235,38 @@ export default function Header() {
       </div>
 
       {/* ── Sticky main header bar ── */}
-      <header className="sticky top-0 z-50 w-full bg-white border-b border-slate-100 shadow-[0_1px_16px_rgba(0,0,0,0.06)]">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-[68px] items-center gap-6">
+      <header className="sticky top-0 z-50 w-full bg-white border-b border-slate-100 shadow-[0_2px_20px_rgba(0,0,0,0.07)]">
+        <div className="mx-auto max-w-7xl px-6 sm:px-8 lg:px-10">
+          <div className="flex h-[80px] items-center gap-8">
 
             {/* Logo */}
-            <Link href="/" data-testid="link-home" className="flex items-center flex-shrink-0 mr-2">
-              <TilconsLogo className="h-10 md:h-11 w-auto" />
+            <Link href="/" data-testid="link-home" className="flex items-center flex-shrink-0 mr-3">
+              <TilconsLogo className="h-12 md:h-13 w-auto" />
             </Link>
 
             {/* Thin vertical divider */}
-            <div className="hidden md:block w-px h-7 bg-slate-200 shrink-0" />
+            <div className="hidden md:block w-px h-8 bg-slate-200 shrink-0" />
 
             {/* LEFT nav links */}
-            <nav className="hidden md:flex items-center gap-0.5 flex-1">
+            <nav className="hidden md:flex items-center gap-1 flex-1">
               <Link
                 href="/"
                 data-testid="link-nav-home"
-                className="relative group px-4 py-2 text-[13px] font-semibold text-slate-600 hover:text-[#0d2137] transition-colors rounded-lg hover:bg-slate-50"
+                className="relative group px-5 py-3 text-[15px] font-semibold text-slate-600 hover:text-[#0d2137] transition-colors rounded-xl hover:bg-slate-50"
               >
                 Home
-                <span className="absolute bottom-1.5 left-4 right-4 h-0.5 bg-sky-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-full" />
+                <span className="absolute bottom-2 left-5 right-5 h-0.5 bg-sky-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-full" />
               </Link>
 
               {/* ABOUT mega-menu */}
               <div className="relative" {...makeHover(setNavCompanyOpen, navCompanyTimeoutRef)}>
                 <button
                   data-testid="button-nav-company"
-                  className={`relative group flex items-center gap-1.5 px-4 py-2 text-[13px] font-semibold rounded-lg transition-colors ${navCompanyOpen ? "text-sky-600 bg-sky-50" : "text-slate-600 hover:text-[#0d2137] hover:bg-slate-50"}`}
+                  className={`relative group flex items-center gap-2 px-5 py-3 text-[15px] font-semibold rounded-xl transition-colors ${navCompanyOpen ? "text-sky-600 bg-sky-50" : "text-slate-600 hover:text-[#0d2137] hover:bg-slate-50"}`}
                 >
                   About
-                  <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${navCompanyOpen ? "rotate-180 text-sky-500" : "text-slate-400"}`} />
-                  {navCompanyOpen && <span className="absolute bottom-1.5 left-4 right-4 h-0.5 bg-sky-500 rounded-full" />}
+                  <ChevronDown className={`h-4 w-4 transition-transform duration-200 ${navCompanyOpen ? "rotate-180 text-sky-500" : "text-slate-400"}`} />
+                  {navCompanyOpen && <span className="absolute bottom-2 left-5 right-5 h-0.5 bg-sky-500 rounded-full" />}
                 </button>
                 {navCompanyOpen && (
                   <div className="absolute top-[calc(100%+6px)] left-0 animate-in fade-in slide-in-from-top-2 duration-200 z-[200]">
@@ -349,30 +349,30 @@ export default function Header() {
               <Link
                 href="/contact"
                 data-testid="link-nav-contact"
-                className="relative group px-4 py-2 text-[13px] font-semibold text-slate-600 hover:text-[#0d2137] transition-colors rounded-lg hover:bg-slate-50"
+                className="relative group px-5 py-3 text-[15px] font-semibold text-slate-600 hover:text-[#0d2137] transition-colors rounded-xl hover:bg-slate-50"
               >
                 Contact
-                <span className="absolute bottom-1.5 left-4 right-4 h-0.5 bg-sky-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-full" />
+                <span className="absolute bottom-2 left-5 right-5 h-0.5 bg-sky-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-full" />
               </Link>
 
               <Link
                 href="/salary-guide"
                 data-testid="link-nav-salary-guide"
-                className="flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-bold text-sky-700 bg-sky-50 border border-sky-200 hover:bg-sky-100 hover:border-sky-300 rounded-lg transition-all ml-1"
+                className="flex items-center gap-2 px-4 py-2.5 text-[15px] font-bold text-sky-700 bg-sky-50 border border-sky-200 hover:bg-sky-100 hover:border-sky-300 rounded-xl transition-all ml-2"
               >
-                <IndianRupee className="h-3.5 w-3.5" />
+                <IndianRupee className="h-4 w-4" />
                 Salary Guide
               </Link>
             </nav>
 
             {/* Right side: CTA + mobile menu */}
-            <div className="flex items-center gap-2 ml-auto">
+            <div className="flex items-center gap-3 ml-auto">
               {/* Desktop CTA */}
-              <Link href="/signin" className="hidden md:flex items-center gap-2 px-4 py-2 text-[13px] font-bold text-white bg-[#0d2137] hover:bg-[#1a3a5c] rounded-lg transition-colors shadow-sm">
-                <LogIn className="h-3.5 w-3.5" />
+              <Link href="/signin" className="hidden md:flex items-center gap-2 px-5 py-2.5 text-[14px] font-bold text-white bg-[#0d2137] hover:bg-[#1a3a5c] rounded-xl transition-colors shadow-sm">
+                <LogIn className="h-4 w-4" />
                 Sign In
               </Link>
-              <Link href="/jobs" className="hidden md:flex items-center gap-2 px-4 py-2 text-[13px] font-bold text-white bg-sky-600 hover:bg-sky-500 rounded-lg transition-colors shadow-sm">
+              <Link href="/jobs" className="hidden md:flex items-center gap-2 px-5 py-2.5 text-[14px] font-bold text-white bg-sky-600 hover:bg-sky-500 rounded-xl transition-colors shadow-sm">
                 Find Jobs
               </Link>
 
