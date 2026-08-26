@@ -47,8 +47,8 @@ export default function Header() {
       {/* ── Top ribbon (scrolls out of view naturally) ── */}
       <div className="hidden md:block bg-[#0d2137] border-b border-white/10 w-full">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-end gap-1 h-11">
-            <div className="flex items-center gap-1">
+          <div className="flex items-center justify-end gap-1 h-11 overflow-visible">
+            <div className="flex items-center gap-1 overflow-visible">
 
             {/* I'm a Candidate */}
             <div
@@ -69,9 +69,9 @@ export default function Header() {
                 <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${jobSeekersOpen ? "rotate-180" : ""}`} />
               </button>
               {jobSeekersOpen && (
-                <div className="absolute top-full left-0 pt-1 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
-                  <div className="w-72 bg-card border border-border rounded-xl shadow-2xl overflow-hidden py-2">
-                    <Link href="/jobs" data-testid="link-browse-jobs" className="flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors">
+                <div className="absolute top-[calc(100%+4px)] left-0 animate-in fade-in slide-in-from-top-2 duration-200 z-[200]">
+                  <div className="w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl overflow-visible py-2">
+                    <Link href="/jobs" data-testid="link-browse-jobs" className="flex items-center gap-3 px-4 py-3 text-sm text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
                       <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
                         <Search className="h-4 w-4" />
                       </div>
@@ -80,8 +80,8 @@ export default function Header() {
                         <p className="text-xs text-muted-foreground">Find your next opportunity</p>
                       </div>
                     </Link>
-                    <Link href="/submit-cv" data-testid="link-submit-cv-new" className="flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors">
-                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                    <Link href="/submit-cv" data-testid="link-submit-cv-new" className="flex items-center gap-3 px-4 py-3 text-sm text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-600">
                         <FileText className="h-4 w-4" />
                       </div>
                       <div>
@@ -89,8 +89,8 @@ export default function Header() {
                         <p className="text-xs text-muted-foreground">Let recruiters find you</p>
                       </div>
                     </Link>
-                    <Link href="/career-advice" data-testid="link-career-advice" className="flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors">
-                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                    <Link href="/career-advice" data-testid="link-career-advice" className="flex items-center gap-3 px-4 py-3 text-sm text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-600">
                         <Lightbulb className="h-4 w-4" />
                       </div>
                       <div>
@@ -99,10 +99,10 @@ export default function Header() {
                       </div>
                     </Link>
 
-                    <div className="my-1.5 border-t border-border" />
+                    <div className="my-1.5 border-t border-slate-200 dark:border-slate-700" />
 
-                    <Link href="/jobseeker-auth" data-testid="link-candidate-login" className="flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors">
-                      <div className="w-8 h-8 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-600 dark:text-sky-400">
+                    <Link href="/jobseeker-auth" data-testid="link-candidate-login" className="flex items-center gap-3 px-4 py-3 text-sm text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-600">
                         <LogIn className="h-4 w-4" />
                       </div>
                       <div>
@@ -135,10 +135,10 @@ export default function Header() {
                 <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${employersOpen ? "rotate-180" : ""}`} />
               </button>
               {employersOpen && (
-                <div className="absolute top-full left-0 pt-1 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
-                  <div className="w-80 bg-card border border-border rounded-xl shadow-2xl overflow-hidden py-2">
-                    <Link href="/employers" data-testid="link-our-services" className="flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors">
-                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                <div className="absolute top-[calc(100%+4px)] left-0 animate-in fade-in slide-in-from-top-2 duration-200 z-[200]">
+                  <div className="w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl overflow-visible py-2">
+                    <Link href="/employers" data-testid="link-our-services" className="flex items-center gap-3 px-4 py-3 text-sm text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-600">
                         <ShieldCheck className="h-4 w-4" />
                       </div>
                       <div>
@@ -146,8 +146,8 @@ export default function Header() {
                         <p className="text-xs text-muted-foreground">Scalable staffing solutions</p>
                       </div>
                     </Link>
-                    <Link href="/upload-job-description" data-testid="link-post-job" className="flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors">
-                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                    <Link href="/upload-job-description" data-testid="link-post-job" className="flex items-center gap-3 px-4 py-3 text-sm text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-600">
                         <FileText className="h-4 w-4" />
                       </div>
                       <div>
@@ -155,8 +155,8 @@ export default function Header() {
                         <p className="text-xs text-muted-foreground">Hire top talent fast</p>
                       </div>
                     </Link>
-                    <Link href="/industries" data-testid="link-industries-we-serve" className="flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors">
-                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+                    <Link href="/industries" data-testid="link-industries-we-serve" className="flex items-center gap-3 px-4 py-3 text-sm text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-600">
                         <Globe className="h-4 w-4" />
                       </div>
                       <div>
@@ -165,7 +165,7 @@ export default function Header() {
                       </div>
                     </Link>
 
-                    <div className="my-1.5 border-t border-border" />
+                    <div className="my-1.5 border-t border-slate-200 dark:border-slate-700" />
 
                     <Link href="/vendor-registration" data-testid="link-become-partner" className="flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors">
                       <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
