@@ -201,10 +201,10 @@ export default function Header() {
                 <ChevronDown className={`h-3 w-3 transition-transform duration-200 ${loginOpen ? "rotate-180" : ""}`} />
               </Link>
               {loginOpen && (
-                <div className="absolute top-full right-0 pt-1 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
-                  <div className="w-80 bg-card border border-border rounded-xl shadow-2xl overflow-hidden py-2">
-                    <Link href="/signin" data-testid="link-login-ats-crm" className="flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors">
-                      <div className="w-8 h-8 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-600 dark:text-sky-400">
+                <div className="absolute top-[calc(100%+4px)] right-0 animate-in fade-in slide-in-from-top-2 duration-200 z-[200]">
+                  <div className="w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-2xl overflow-visible py-2">
+                    <Link href="/signin" data-testid="link-login-ats-crm" className="flex items-center gap-3 px-4 py-3 text-sm text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-600">
                         <LayoutDashboard className="h-4 w-4" />
                       </div>
                       <div>
@@ -213,10 +213,10 @@ export default function Header() {
                       </div>
                     </Link>
 
-                    <div className="my-1.5 border-t border-border" />
+                    <div className="my-1.5 border-t border-slate-200 dark:border-slate-700" />
 
-                    <Link href="/get-started" data-testid="link-login-demo" className="flex items-center gap-3 px-4 py-3 text-sm text-foreground hover:bg-muted transition-colors">
-                      <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                    <Link href="/get-started" data-testid="link-login-demo" className="flex items-center gap-3 px-4 py-3 text-sm text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+                      <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-600">
                         <Handshake className="h-4 w-4" />
                       </div>
                       <div>
