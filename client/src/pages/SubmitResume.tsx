@@ -74,8 +74,43 @@ export default function SubmitResume() {
 
   const [resumeFile, setResumeFile] = useState<File | null>(null);
 
+  // Helper: upload file to Cloudflare R2 via server API and return a public URL
+  const uploadResumeToStorage = async (file: File): Promise<string | null> => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await fetch("/api/upload-resume", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({ message: "Upload failed" }));
+        throw new Error(err.message || "Upload failed");
+      }
+
+      const result = await response.json();
+      return result.url || null;
+    } catch (err: any) {
+      console.error("Resume upload failed:", err);
+      toast({
+        title: "Resume upload failed",
+        description: err.message || "Could not upload your resume file. Your profile will be saved without the file.",
+        variant: "destructive",
+      });
+      return null;
+    }
+  };
+
   const submitMutation = useMutation({
     mutationFn: async (data: any) => {
+      // Upload the actual file first if present
+      let resumePublicUrl: string | null = null;
+      if (data.resumeFile) {
+        resumePublicUrl = await uploadResumeToStorage(data.resumeFile);
+      }
+
       if (jobId) {
         const { data: resData, error } = await supabase
           .from("applications")
@@ -85,7 +120,7 @@ export default function SubmitResume() {
             applicant_name: data.fullName,
             email: data.email,
             phone: data.phone,
-            resume_url: data.resumeFile?.filename || null,
+            resume_url: resumePublicUrl,
             cover_letter: data.additionalInfo,
             status: "new",
             source: "Direct"
@@ -106,7 +141,7 @@ export default function SubmitResume() {
             skills: data.skills,
             linked_in: data.linkedIn,
             additional_info: data.additionalInfo,
-            resume_url: data.resumeFile?.filename || null
+            resume_url: resumePublicUrl
           }])
           .select();
         if (error) throw error;
@@ -159,17 +194,6 @@ export default function SubmitResume() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    let fileData = null;
-    if (resumeFile) {
-      const reader = new FileReader();
-      fileData = await new Promise((resolve) => {
-        reader.onloadend = () => {
-          const base64 = reader.result as string;
-          resolve({ filename: resumeFile.name, contentType: resumeFile.type, data: base64.split(',')[1] });
-        };
-        reader.readAsDataURL(resumeFile);
-      });
-    }
     submitMutation.mutate({
       fullName: formData.fullName,
       email: formData.email,
@@ -179,7 +203,7 @@ export default function SubmitResume() {
       skills: formData.skills,
       linkedIn: formData.linkedIn || undefined,
       additionalInfo: formData.additionalInfo || undefined,
-      resumeFile: fileData
+      resumeFile: resumeFile  // Pass the actual File object now
     });
   };
 

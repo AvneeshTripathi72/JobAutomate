@@ -45,7 +45,7 @@ export function ResumeViewerModal({ seeker, open, onClose, onAtsClick }: ResumeV
             <p className="text-xs text-slate-400 truncate">{seeker.currentPosition || "Candidate"}</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button size="sm" variant="ghost" className="text-slate-300 hover:text-white" onClick={() => seeker.resumeUrl ? window.open(seeker.resumeUrl, "_blank") : toast({ title: "No resume file uploaded yet" })}>
+            <Button size="sm" variant="ghost" className="text-slate-300 hover:text-white" onClick={() => seeker.resumeUrl && (seeker.resumeUrl.startsWith("http://") || seeker.resumeUrl.startsWith("https://")) ? window.open(seeker.resumeUrl, "_blank") : toast({ title: "No resume file uploaded yet" })}>
               <Download className="h-4 w-4 mr-1.5" /> Download
             </Button>
             <Button size="sm" className="bg-[#0ea5e9] hover:bg-[#0ea5e9]/95 text-white" onClick={onAtsClick}>
@@ -88,88 +88,85 @@ export function ResumeViewerModal({ seeker, open, onClose, onAtsClick }: ResumeV
           </div>
         </div>
 
-        {/* Resume Content Sheet */}
+        {/* Resume Content */}
         <div className="flex-1 overflow-auto bg-slate-100 dark:bg-slate-950 p-8 flex justify-center items-start">
-          <div 
-            className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-2xl p-12 border border-slate-200 dark:border-slate-800 transition-all duration-200 text-left"
-            style={{ 
-              width: "100%", 
-              maxWidth: `${720 * (scale / 100)}px`,
-              minHeight: `${960 * (scale / 100)}px`,
-              fontSize: `${14 * (scale / 100)}px`
-            }}
-          >
-            {/* Header */}
-            <div className="border-b-2 border-[#0ea5e9] pb-6 mb-6">
-              <h1 className="font-extrabold tracking-tight uppercase" style={{ fontSize: `${28 * (scale / 100)}px` }}>{seeker.fullName}</h1>
-              <p className="text-[#0ea5e9] font-bold tracking-wide uppercase mt-1" style={{ fontSize: `${14 * (scale / 100)}px` }}>{seeker.currentPosition || "Software Engineer"}</p>
-              
-              <div className="flex flex-wrap gap-4 mt-4 text-slate-500 dark:text-slate-400" style={{ fontSize: `${11 * (scale / 100)}px` }}>
-                <span>Email: {seeker.email}</span>
-                {seeker.phone && <span>Phone: {seeker.phone}</span>}
-                {seeker.experienceLevel && <span>Exp: {seeker.experienceLevel}</span>}
-              </div>
-            </div>
-
-            {/* Profile Summary */}
-            <div className="mb-6">
-              <h3 className="font-bold text-[#0ea5e9] uppercase tracking-wider mb-2" style={{ fontSize: `${12 * (scale / 100)}px` }}>Professional Profile</h3>
-              <p className="leading-relaxed text-slate-700 dark:text-slate-300">
-                Highly motivated and results-driven specialist with a proven track record of designing, building, and deploying complex solutions. Adept at leveraging modern web technologies and architectures to solve mission-critical challenges and scale software delivery.
+          {seeker.resumeUrl && (seeker.resumeUrl.startsWith("http://") || seeker.resumeUrl.startsWith("https://")) ? (
+            /* Show the actual uploaded PDF/document */
+            <div className="w-full h-full flex flex-col items-center" style={{ transform: `scale(${scale / 100})`, transformOrigin: "top center" }}>
+              <iframe
+                src={seeker.resumeUrl}
+                className="w-full bg-white rounded-lg shadow-2xl border border-slate-200 dark:border-slate-800"
+                style={{ 
+                  width: "100%", 
+                  maxWidth: "720px",
+                  height: "100%",
+                  minHeight: "900px"
+                }}
+                title={`${seeker.fullName} Resume`}
+              />
+              <p className="text-xs text-muted-foreground mt-3">
+                If the document doesn't load,{" "}
+                <a 
+                  href={seeker.resumeUrl} 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-[#0ea5e9] hover:underline font-medium"
+                >
+                  open it directly
+                </a>
               </p>
             </div>
+          ) : (
+            /* No file uploaded — show formatted profile from seeker data */
+            <div 
+              className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-2xl p-12 border border-slate-200 dark:border-slate-800 transition-all duration-200 text-left"
+              style={{ 
+                width: "100%", 
+                maxWidth: `${720 * (scale / 100)}px`,
+                minHeight: `${960 * (scale / 100)}px`,
+                fontSize: `${14 * (scale / 100)}px`
+              }}
+            >
+              {/* Header */}
+              <div className="border-b-2 border-[#0ea5e9] pb-6 mb-6">
+                <h1 className="font-extrabold tracking-tight uppercase" style={{ fontSize: `${28 * (scale / 100)}px` }}>{seeker.fullName}</h1>
+                <p className="text-[#0ea5e9] font-bold tracking-wide uppercase mt-1" style={{ fontSize: `${14 * (scale / 100)}px` }}>{seeker.currentPosition || "Candidate"}</p>
+                
+                <div className="flex flex-wrap gap-4 mt-4 text-slate-500 dark:text-slate-400" style={{ fontSize: `${11 * (scale / 100)}px` }}>
+                  <span>Email: {seeker.email}</span>
+                  {seeker.phone && <span>Phone: {seeker.phone}</span>}
+                  {seeker.experienceLevel && <span>Exp: {seeker.experienceLevel}</span>}
+                </div>
+              </div>
 
-            {/* Experience */}
-            <div className="mb-6">
-              <h3 className="font-bold text-[#0ea5e9] uppercase tracking-wider mb-2" style={{ fontSize: `${12 * (scale / 100)}px` }}>Work Experience</h3>
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between items-baseline">
-                    <p className="font-bold text-slate-800 dark:text-slate-200">Senior Software Engineer</p>
-                    <p className="text-slate-400 text-xs">2022 - Present</p>
+              <div className="mb-6 p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                <p className="text-amber-700 dark:text-amber-400 text-sm font-medium flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  No resume file was uploaded. Showing candidate profile data only.
+                </p>
+              </div>
+
+              {/* Skills */}
+              {seeker.skills && (
+                <div className="mb-6">
+                  <h3 className="font-bold text-[#0ea5e9] uppercase tracking-wider mb-2" style={{ fontSize: `${12 * (scale / 100)}px` }}>Skills</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {seeker.skills.split(",").map((s, i) => (
+                      <Badge key={i} variant="secondary" style={{ fontSize: `${11 * (scale / 100)}px` }}>{s.trim()}</Badge>
+                    ))}
                   </div>
-                  <p className="text-slate-500 dark:text-slate-400 text-xs italic">Tilcons Staffing Corp</p>
-                  <ul className="list-disc list-inside mt-2 space-y-1.5 text-slate-700 dark:text-slate-300 pl-2">
-                    <li>Led migration of candidate matching systems to direct serverless microservices.</li>
-                    <li>Designed and scaled secure user authentication and database schemas.</li>
-                    <li>Collaborated on building multi-tenant staffing panels with real-time activities.</li>
-                  </ul>
                 </div>
-              </div>
-            </div>
+              )}
 
-            {/* Education */}
-            <div className="mb-6">
-              <h3 className="font-bold text-[#0ea5e9] uppercase tracking-wider mb-2" style={{ fontSize: `${12 * (scale / 100)}px` }}>Education & Qualifications</h3>
-              <div className="flex justify-between items-baseline">
-                <div>
-                  <p className="font-bold text-slate-800 dark:text-slate-200">{seeker.education || "Bachelor of Technology in Computer Science"}</p>
-                  <p className="text-slate-500 dark:text-slate-400 text-xs">Top Tier Indian Institute</p>
+              {/* Additional Info */}
+              {(seeker as any).additionalInfo && (
+                <div className="mb-6">
+                  <h3 className="font-bold text-[#0ea5e9] uppercase tracking-wider mb-2" style={{ fontSize: `${12 * (scale / 100)}px` }}>Additional Information</h3>
+                  <p className="leading-relaxed text-slate-700 dark:text-slate-300">{(seeker as any).additionalInfo}</p>
                 </div>
-                <p className="text-slate-400 text-xs">Graduated 2021</p>
-              </div>
+              )}
             </div>
-
-            {/* Skills */}
-            <div>
-              <h3 className="font-bold text-[#0ea5e9] uppercase tracking-wider mb-2" style={{ fontSize: `${12 * (scale / 100)}px` }}>Core Skills & Technologies</h3>
-              <div className="flex flex-wrap gap-2">
-                {seeker.skills ? (
-                  seeker.skills.split(",").map((s, i) => (
-                    <Badge key={i} variant="secondary" style={{ fontSize: `${11 * (scale / 100)}px` }}>{s.trim()}</Badge>
-                  ))
-                ) : (
-                  <>
-                    <Badge variant="secondary">React</Badge>
-                    <Badge variant="secondary">TypeScript</Badge>
-                    <Badge variant="secondary">Node.js</Badge>
-                    <Badge variant="secondary">SQL</Badge>
-                    <Badge variant="secondary">Git</Badge>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

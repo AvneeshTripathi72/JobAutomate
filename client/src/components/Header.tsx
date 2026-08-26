@@ -363,6 +363,15 @@ export default function Header() {
                 <IndianRupee className="h-4 w-4" />
                 Salary Guide
               </Link>
+
+              <Link
+                href="/submit-cv"
+                data-testid="link-nav-submit-resume"
+                className="flex items-center gap-2 px-4 py-2.5 text-[15px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 hover:border-emerald-300 rounded-xl transition-all"
+              >
+                <FileText className="h-4 w-4" />
+                Submit Resume
+              </Link>
             </nav>
 
             {/* Right side: CTA + mobile menu */}

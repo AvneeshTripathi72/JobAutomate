@@ -2508,7 +2508,7 @@ export default function Admin() {
                               <Button 
                                 size="sm" variant="ghost" 
                                 className="h-8 text-xs font-semibold hover:bg-white hover:text-slate-900 hover:shadow-sm shrink-0"
-                                onClick={() => seeker.resumeUrl ? window.open(seeker.resumeUrl, "_blank") : toast({ title: "No resume file uploaded yet" })}
+                                onClick={() => seeker.resumeUrl && (seeker.resumeUrl.startsWith("http://") || seeker.resumeUrl.startsWith("https://")) ? window.open(seeker.resumeUrl, "_blank") : toast({ title: "No resume file uploaded yet" })}
                                 data-testid={`button-download-seeker-${seeker.id || ""}`}
                               >
                                 <Download className="h-3.5 w-3.5 mr-1 text-slate-500" /> Download
