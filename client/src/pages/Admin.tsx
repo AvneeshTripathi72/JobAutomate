@@ -2414,9 +2414,10 @@ export default function Admin() {
                           className={`border ${selectedJobSeekers.includes(seeker.id || "") ? "border-[#0ea5e9] shadow-md ring-1 ring-[#0ea5e9]/30" : "border-0 shadow-sm"} hover-elevate transition-all`}
                           data-testid={`card-jobseeker-${seeker.id || ""}`}
                         >
-                          <CardContent className="p-4">
-                            <div className="flex items-start gap-4 flex-wrap">
-                              <div className="pt-2">
+                          <CardContent className="p-0">
+                            {/* Top info row */}
+                            <div className="flex items-start gap-3 p-4 pb-3">
+                              <div className="pt-1">
                                 <Checkbox
                                   checked={selectedJobSeekers.includes(
                                     seeker.id || "",
@@ -2486,92 +2487,105 @@ export default function Admin() {
                                   </span>
                                 </div>
                               </div>
-                              <div className="flex items-center gap-1.5 shrink-0 ml-auto flex-wrap">
-                                <Button 
-                                  size="sm" variant="ghost" className="h-8 text-xs font-semibold hover:bg-slate-100 hover:text-slate-900"
-                                  onClick={() => {
-                                    setActiveSeeker(seeker);
-                                    setShowViewer(true);
-                                  }}
-                                  data-testid={`button-view-seeker-${seeker.id || ""}`}
-                                >
-                                  <Eye className="h-3.5 w-3.5 mr-1" /> View
-                                </Button>
-                                <Button 
-                                  size="sm" variant="ghost" className="h-8 text-xs font-semibold hover:bg-slate-100 hover:text-slate-900"
-                                  onClick={() => seeker.resumeUrl ? window.open(seeker.resumeUrl, "_blank") : toast({ title: "No resume file uploaded yet" })}
-                                  data-testid={`button-download-seeker-${seeker.id || ""}`}
-                                >
-                                  <Download className="h-3.5 w-3.5 mr-1" /> Download
-                                </Button>
-                                <Button 
-                                  size="sm" variant="ghost" className="h-8 text-xs font-semibold text-[#0ea5e9] hover:bg-[#0ea5e9]/10 hover:text-[#0ea5e9]"
-                                  onClick={() => {
-                                    setActiveSeeker(seeker);
-                                    setShowAts(true);
-                                  }}
-                                  data-testid={`button-ats-seeker-${seeker.id || ""}`}
-                                >
-                                  <Sparkles className="h-3.5 w-3.5 mr-1" /> ATS Analysis
-                                </Button>
-                                <Button 
-                                  size="sm" variant="ghost" className="h-8 text-xs font-semibold hover:bg-slate-100 hover:text-slate-900"
-                                  onClick={() => {
-                                    setNoteSeeker(seeker);
-                                    setNoteText(seeker.additionalInfo || "");
-                                  }}
-                                  data-testid={`button-notes-seeker-${seeker.id || ""}`}
-                                >
-                                  <FileText className="h-3.5 w-3.5 mr-1" /> Notes
-                                </Button>
-                                <Button 
-                                  size="sm" variant="ghost" className="h-8 text-xs font-semibold text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/20"
-                                  onClick={async () => {
+                            </div>
+
+                            {/* Divider */}
+                            <div className="border-t border-slate-100 dark:border-slate-800" />
+
+                            {/* Action bar – always fully visible */}
+                            <div className="flex items-center gap-0 px-3 py-2 bg-slate-50/60 dark:bg-slate-900/30 rounded-b-lg overflow-x-auto">
+                              <Button 
+                                size="sm" variant="ghost" 
+                                className="h-8 text-xs font-semibold hover:bg-white hover:text-slate-900 hover:shadow-sm shrink-0"
+                                onClick={() => {
+                                  setActiveSeeker(seeker);
+                                  setShowViewer(true);
+                                }}
+                                data-testid={`button-view-seeker-${seeker.id || ""}`}
+                              >
+                                <Eye className="h-3.5 w-3.5 mr-1 text-slate-500" /> View
+                              </Button>
+                              <Button 
+                                size="sm" variant="ghost" 
+                                className="h-8 text-xs font-semibold hover:bg-white hover:text-slate-900 hover:shadow-sm shrink-0"
+                                onClick={() => seeker.resumeUrl ? window.open(seeker.resumeUrl, "_blank") : toast({ title: "No resume file uploaded yet" })}
+                                data-testid={`button-download-seeker-${seeker.id || ""}`}
+                              >
+                                <Download className="h-3.5 w-3.5 mr-1 text-slate-500" /> Download
+                              </Button>
+                              <Button 
+                                size="sm" variant="ghost" 
+                                className="h-8 text-xs font-semibold text-[#0ea5e9] hover:bg-[#0ea5e9]/10 hover:text-[#0ea5e9] hover:shadow-sm shrink-0"
+                                onClick={() => {
+                                  setActiveSeeker(seeker);
+                                  setShowAts(true);
+                                }}
+                                data-testid={`button-ats-seeker-${seeker.id || ""}`}
+                              >
+                                <Sparkles className="h-3.5 w-3.5 mr-1" /> ATS Analysis
+                              </Button>
+                              <Button 
+                                size="sm" variant="ghost" 
+                                className="h-8 text-xs font-semibold hover:bg-white hover:text-slate-900 hover:shadow-sm shrink-0"
+                                onClick={() => {
+                                  setNoteSeeker(seeker);
+                                  setNoteText(seeker.additionalInfo || "");
+                                }}
+                                data-testid={`button-notes-seeker-${seeker.id || ""}`}
+                              >
+                                <FileText className="h-3.5 w-3.5 mr-1 text-slate-500" /> Notes
+                              </Button>
+                              <div className="w-px h-5 bg-slate-200 dark:bg-slate-700 mx-1 shrink-0" />
+                              <Button 
+                                size="sm" variant="ghost" 
+                                className="h-8 text-xs font-semibold text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 hover:shadow-sm shrink-0"
+                                onClick={async () => {
+                                  try {
+                                    const { error } = await supabase
+                                      .from("resumes")
+                                      .update({ is_hotlisted: true })
+                                      .eq("id", seeker.id || "");
+                                    if (error) throw error;
+                                    toast({ title: "Candidate shortlisted", description: `${seeker.fullName} has been added to the shortlist.` });
+                                    queryClient.invalidateQueries({ queryKey: ["/api/admin/jobseekers"] });
+                                  } catch (err) {
+                                    toast({ title: "Failed to shortlist candidate", variant: "destructive" });
+                                  }
+                                }}
+                                data-testid={`button-shortlist-seeker-${seeker.id || ""}`}
+                              >
+                                <Star className="h-3.5 w-3.5 mr-1 fill-current" /> Shortlist
+                              </Button>
+                              <Button 
+                                size="sm" variant="ghost" 
+                                className="h-8 text-xs font-semibold text-rose-500 hover:bg-rose-50 hover:text-rose-600 hover:shadow-sm shrink-0"
+                                onClick={async () => {
+                                  if (confirm(`Are you sure you want to reject candidate ${seeker.fullName}?`)) {
                                     try {
                                       const { error } = await supabase
                                         .from("resumes")
-                                        .update({ is_hotlisted: true })
+                                        .delete()
                                         .eq("id", seeker.id || "");
                                       if (error) throw error;
-                                      toast({ title: "Candidate shortlisted", description: `${seeker.fullName} has been added to the shortlist.` });
+                                      toast({ title: "Candidate rejected and removed", variant: "destructive" });
                                       queryClient.invalidateQueries({ queryKey: ["/api/admin/jobseekers"] });
                                     } catch (err) {
-                                      toast({ title: "Failed to shortlist candidate", variant: "destructive" });
+                                      toast({ title: "Failed to reject candidate", variant: "destructive" });
                                     }
-                                  }}
-                                  data-testid={`button-shortlist-seeker-${seeker.id || ""}`}
-                                >
-                                  <Star className="h-3.5 w-3.5 mr-1 fill-current" /> Shortlist
-                                </Button>
-                                <Button 
-                                  size="sm" variant="ghost" className="h-8 text-xs font-semibold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20"
-                                  onClick={async () => {
-                                    if (confirm(`Are you sure you want to reject candidate ${seeker.fullName}?`)) {
-                                      try {
-                                        const { error } = await supabase
-                                          .from("resumes")
-                                          .delete()
-                                          .eq("id", seeker.id || "");
-                                        if (error) throw error;
-                                        toast({ title: "Candidate rejected and removed", variant: "destructive" });
-                                        queryClient.invalidateQueries({ queryKey: ["/api/admin/jobseekers"] });
-                                      } catch (err) {
-                                        toast({ title: "Failed to reject candidate", variant: "destructive" });
-                                      }
-                                    }
-                                  }}
-                                  data-testid={`button-reject-seeker-${seeker.id || ""}`}
-                                >
-                                  <X className="h-3.5 w-3.5 mr-1" /> Reject
-                                </Button>
-                                <HotlistToggleButton
-                                  jobSeekerId={seeker.id || ""}
-                                  isHotlisted={seeker.isHotlisted ?? false}
-                                />
-                              </div>
+                                  }
+                                }}
+                                data-testid={`button-reject-seeker-${seeker.id || ""}`}
+                              >
+                                <X className="h-3.5 w-3.5 mr-1" /> Reject
+                              </Button>
+                              <HotlistToggleButton
+                                jobSeekerId={seeker.id || ""}
+                                isHotlisted={seeker.isHotlisted ?? false}
+                              />
                             </div>
                           </CardContent>
                         </Card>
+
                       ))}
                     {jobSeekers.filter((s) => {
                       if (!seekerSearch) return true;
