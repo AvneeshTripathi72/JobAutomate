@@ -3,6 +3,8 @@ import { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { useToast } from '@/hooks/use-toast';
 
+import { useMutation } from '@tanstack/react-query';
+
 type AuthContextType = {
   user: User | null;
   isLoading: boolean;
@@ -33,39 +35,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const loginMutation = {
-    mutateAsync: async (credentials: any) => {
+  const loginMutation = useMutation({
+    mutationFn: async (credentials: any) => {
       const { data, error } = await supabase.auth.signInWithPassword({
         email: credentials.username || credentials.email,
         password: credentials.password,
       });
       if (error) {
-        toast({ title: 'Login failed', description: error.message, variant: 'destructive' });
         throw error;
       }
       return data.user;
     },
-  };
+    onError: (error: Error) => {
+      toast({ title: 'Login failed', description: error.message, variant: 'destructive' });
+    },
+  });
 
-  const registerMutation = {
-    mutateAsync: async (credentials: any) => {
+  const registerMutation = useMutation({
+    mutationFn: async (credentials: any) => {
       const { data, error } = await supabase.auth.signUp({
         email: credentials.email || credentials.username,
         password: credentials.password,
       });
       if (error) {
-        toast({ title: 'Registration failed', description: error.message, variant: 'destructive' });
         throw error;
       }
       return data.user;
     },
-  };
-
-  const logoutMutation = {
-    mutateAsync: async () => {
-      await supabase.auth.signOut();
+    onError: (error: Error) => {
+      toast({ title: 'Registration failed', description: error.message, variant: 'destructive' });
     },
-  };
+  });
+
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+    },
+    onError: (error: Error) => {
+      toast({ title: 'Logout failed', description: error.message, variant: 'destructive' });
+    },
+  });
 
   return (
     <AuthContext.Provider

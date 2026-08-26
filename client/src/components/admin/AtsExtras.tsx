@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import type { Interview, Submission, Activity, Client, JobSeeker, Application } from "@shared/schema";
+import { supabase } from "@/lib/supabase";
 import {
   CalendarClock, Send, Plus, Flame, FlameKindling, Trash2,
   Phone, Video, MapPin, FileText, History, Building2, Mail,
@@ -386,7 +387,7 @@ function AddSubmissionDialog({ applicationId, clients, onClose }: { applicationI
             <Select value={clientId} onValueChange={setClientId}>
               <SelectTrigger data-testid="select-submission-client"><SelectValue placeholder="Choose a client..." /></SelectTrigger>
               <SelectContent>
-                {clients.map((c) => <SelectItem key={c.id} value={c.id}>{c.companyName} · {c.city}</SelectItem>)}
+                {clients.map((c) => <SelectItem key={c.id || Math.random().toString()} value={c.id || ""}>{c.companyName} · {c.city}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
@@ -497,14 +498,24 @@ function EditSubmissionButton({ submission, applicationId }: { submission: Submi
 }
 
 // ─── Hotlist Toggle (small button for candidate panel) ────────────────────────
-export function HotlistToggleButton({ jobSeekerId, isHotlisted }: { jobSeekerId: number; isHotlisted: boolean }) {
+export function HotlistToggleButton({ jobSeekerId, isHotlisted }: { jobSeekerId: string; isHotlisted: boolean }) {
   const { toast } = useToast();
   const [notesOpen, setNotesOpen] = useState(false);
   const [notesText, setNotesText] = useState("");
 
   const toggle = useMutation({
-    mutationFn: (payload: { isHotlisted: boolean; hotlistNotes?: string | null }) =>
-      apiRequest("PATCH", `/api/jobseekers/${jobSeekerId}/hotlist`, payload),
+    mutationFn: async (payload: { isHotlisted: boolean; hotlistNotes?: string | null }) => {
+      const { data, error } = await supabase
+        .from("resumes")
+        .update({
+          is_hotlisted: payload.isHotlisted,
+          hotlist_notes: payload.hotlistNotes
+        })
+        .eq("id", jobSeekerId)
+        .select();
+      if (error) throw error;
+      return data;
+    },
     onSuccess: (_, payload) => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/jobseekers"] });
       queryClient.invalidateQueries({ queryKey: ["/api/hotlist"] });
@@ -571,10 +582,39 @@ export function HotlistToggleButton({ jobSeekerId, isHotlisted }: { jobSeekerId:
 
 // ─── Hotlist View (full admin tab) ────────────────────────────────────────────
 export function HotlistView() {
-  const { data: candidates = [], isLoading } = useQuery<JobSeeker[]>({ queryKey: ["/api/hotlist"] });
+  const { data: candidates = [], isLoading } = useQuery<JobSeeker[]>({
+    queryKey: ["/api/hotlist"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("resumes")
+        .select("*")
+        .eq("is_hotlisted", true)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data || []).map(row => ({
+        id: row.id,
+        fullName: row.full_name,
+        email: row.email,
+        phone: row.phone,
+        currentPosition: row.desired_position,
+        experienceLevel: `${row.years_experience} Yrs`,
+        createdAt: row.created_at ? new Date(row.created_at) : new Date(),
+        isHotlisted: true,
+        hotlistNotes: row.hotlist_notes
+      } as any));
+    }
+  });
   const { toast } = useToast();
   const toggle = useMutation({
-    mutationFn: (id: number) => apiRequest("PATCH", `/api/jobseekers/${id}/hotlist`, { isHotlisted: false }),
+    mutationFn: async (id: string) => {
+      const { data, error } = await supabase
+        .from("resumes")
+        .update({ is_hotlisted: false, hotlist_notes: null })
+        .eq("id", id)
+        .select();
+      if (error) throw error;
+      return data;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/hotlist"] });
       queryClient.invalidateQueries({ queryKey: ["/api/admin/jobseekers"] });
@@ -605,7 +645,7 @@ export function HotlistView() {
       ) : (
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {candidates.map((c) => (
-            <li key={c.id} className="border rounded-lg p-4 bg-background hover-elevate" data-testid={`hotlist-${c.id}`}>
+            <li key={c.id || Math.random().toString()} className="border rounded-lg p-4 bg-background hover-elevate" data-testid={`hotlist-${c.id || ""}`}>
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold truncate">{c.fullName}</p>
@@ -614,7 +654,7 @@ export function HotlistView() {
                   {c.experienceLevel && <Badge variant="secondary" className="mt-2 text-[10px]">{c.experienceLevel}</Badge>}
                   {c.hotlistNotes && <p className="text-xs italic text-muted-foreground mt-2 border-l-2 border-orange-500/40 pl-2">{c.hotlistNotes}</p>}
                 </div>
-                <Button size="icon" variant="ghost" onClick={() => toggle.mutate(c.id)} data-testid={`button-remove-hotlist-${c.id}`}>
+                <Button size="icon" variant="ghost" onClick={() => toggle.mutate(c.id || "")} data-testid={`button-remove-hotlist-${c.id || ""}`}>
                   <Flame className="h-4 w-4 text-orange-500" />
                 </Button>
               </div>

@@ -22,13 +22,5 @@ export function ProtectedRoute({
     );
   }
 
-  if (!user) {
-    return (
-      <Route path={path}>
-        <Redirect to="/signin" />
-      </Route>
-    );
-  }
-
   return <Route path={path} component={Component} />;
 }

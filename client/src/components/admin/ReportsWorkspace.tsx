@@ -108,7 +108,7 @@ export default function ReportsWorkspace() {
           .filter((a) => a.status === "hired")
           .reduce((acc, a) => {
             const days =
-              (new Date().getTime() - new Date(a.appliedDate).getTime()) /
+              (new Date().getTime() - new Date(a.appliedDate || new Date()).getTime()) /
               (1000 * 3600 * 24);
             return acc + days;
           }, 0) / hiredCount

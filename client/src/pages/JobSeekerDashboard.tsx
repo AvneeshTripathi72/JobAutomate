@@ -264,10 +264,10 @@ export default function JobSeekerDashboard() {
         ) : (
           filtered.slice(0, 5).map((job) => (
             <JobCard
-              key={job.id}
+              key={job.id || Math.random().toString()}
               job={job}
-              saved={savedJobIds.has(job.id)}
-              onToggleSave={(save) => toggleSaveJob(job.id, save)}
+              saved={savedJobIds.has(job.id || "")}
+              onToggleSave={(save) => toggleSaveJob(job.id || "", save)}
             />
           ))
         )}
@@ -357,12 +357,12 @@ export default function JobSeekerDashboard() {
         ) : (
           <div className="divide-y divide-gray-100">
             {myApplications.map(app => {
-              const stage = PIPELINE_STAGES[app.status] || PIPELINE_STAGES.new;
+              const stage = PIPELINE_STAGES[app.status || "new"] || PIPELINE_STAGES.new;
               return (
                 <div key={app.id} className="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-gray-50/50 transition-colors">
                   <div>
                     <h4 className="text-sm font-bold text-[#0d2137]">{app.jobTitle}</h4>
-                    <p className="text-xs text-gray-500 mt-1">Applied on {new Date(app.appliedDate).toLocaleDateString()}</p>
+                    <p className="text-xs text-gray-500 mt-1">Applied on {app.appliedDate ? new Date(app.appliedDate).toLocaleDateString() : ""}</p>
                   </div>
                   <div className="flex items-center gap-3">
                     <span 
@@ -382,7 +382,7 @@ export default function JobSeekerDashboard() {
   );
 
   const renderSavedJobsTab = () => {
-    const savedJobsList = jobs.filter(j => savedJobIds.has(j.id));
+    const savedJobsList = jobs.filter(j => savedJobIds.has(j.id || ""));
     return (
       <div className="flex flex-col gap-4">
         <h2 className="text-lg font-black text-[#0d2137] mb-2">Saved Jobs</h2>
@@ -394,10 +394,10 @@ export default function JobSeekerDashboard() {
         ) : (
           savedJobsList.map((job) => (
             <JobCard
-              key={job.id}
+              key={job.id || Math.random().toString()}
               job={job}
               saved={true}
-              onToggleSave={(save) => toggleSaveJob(job.id, save)}
+              onToggleSave={(save) => toggleSaveJob(job.id || "", save)}
             />
           ))
         )}
@@ -625,7 +625,7 @@ function JobCard({
   onToggleSave: (save: boolean) => void;
 }) {
   const daysAgo = Math.floor(
-    (Date.now() - new Date(job.postedDate).getTime()) / (1000 * 60 * 60 * 24)
+    (Date.now() - new Date(job.postedDate || new Date()).getTime()) / (1000 * 60 * 60 * 24)
   );
   const label = daysAgo === 0 ? "Today" : daysAgo === 1 ? "1 day ago" : `${daysAgo} days ago`;
   const initials = job.company.slice(0, 2).toUpperCase();

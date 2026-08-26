@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { supabase } from "@/lib/supabase";
 import {
   Building2, Plus, TrendingUp, IndianRupee, Target, Trash2, Briefcase,
   CheckCircle2, Pencil,
@@ -149,8 +150,45 @@ function NewClientDialog() {
 
   const mutation = useMutation({
     mutationFn: async (data: ClientForm) => {
-      const res = await apiRequest("POST", "/api/crm/clients", data);
-      return res.json();
+      // 1. Create company row first
+      let { data: companyData } = await supabase
+        .from("companies")
+        .select("id")
+        .eq("name", data.companyName)
+        .maybeSingle();
+
+      let companyId;
+      if (companyData) {
+        companyId = companyData.id;
+      } else {
+        const { data: newComp, error: insertCompErr } = await supabase
+          .from("companies")
+          .insert([{ name: data.companyName }])
+          .select()
+          .single();
+        if (insertCompErr) throw insertCompErr;
+        companyId = newComp.id;
+      }
+
+      // 2. Insert Client
+      const { data: clientData, error } = await supabase
+        .from("clients")
+        .insert([{
+          company_id: companyId,
+          company_name: data.companyName,
+          industry: data.industry,
+          city: data.city,
+          primary_contact_name: data.primaryContactName,
+          primary_contact_email: data.primaryContactEmail,
+          primary_contact_phone: data.primaryContactPhone || null,
+          account_owner: data.accountOwner || "Unassigned",
+          arr_inr: data.arrInr || 0,
+          notes: data.notes || null,
+          status: data.status || "active"
+        }])
+        .select();
+      if (error) throw error;
+      return clientData;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/crm/clients"] });
@@ -158,7 +196,7 @@ function NewClientDialog() {
       setOpen(false);
       setForm(DEFAULT_CLIENT_FORM);
     },
-    onError: () => toast({ title: "Could not save", description: "Check required fields and try again.", variant: "destructive" }),
+    onError: (error: Error) => toast({ title: "Could not save", description: error.message || "Check required fields and try again.", variant: "destructive" }),
   });
 
   return (
@@ -199,7 +237,7 @@ function EditClientDialog({ client, onClose }: { client: Client; onClose: () => 
     primaryContactName: client.primaryContactName,
     primaryContactEmail: client.primaryContactEmail,
     primaryContactPhone: client.primaryContactPhone ?? "",
-    status: client.status,
+    status: client.status || "lead",
     accountOwner: client.accountOwner ?? "Unassigned",
     arrInr: client.arrInr ?? 0,
     notes: client.notes ?? "",
@@ -207,15 +245,53 @@ function EditClientDialog({ client, onClose }: { client: Client; onClose: () => 
 
   const mutation = useMutation({
     mutationFn: async (data: ClientForm) => {
-      const res = await apiRequest("PATCH", `/api/crm/clients/${client.id}`, data);
-      return res.json();
+      // 1. Find or create company
+      let { data: companyData } = await supabase
+        .from("companies")
+        .select("id")
+        .eq("name", data.companyName)
+        .maybeSingle();
+
+      let companyId;
+      if (companyData) {
+        companyId = companyData.id;
+      } else {
+        const { data: newComp, error: insertCompErr } = await supabase
+          .from("companies")
+          .insert([{ name: data.companyName }])
+          .select()
+          .single();
+        if (insertCompErr) throw insertCompErr;
+        companyId = newComp.id;
+      }
+
+      // 2. Update Client
+      const { data: clientData, error } = await supabase
+        .from("clients")
+        .update({
+          company_id: companyId,
+          company_name: data.companyName,
+          industry: data.industry,
+          city: data.city,
+          primary_contact_name: data.primaryContactName,
+          primary_contact_email: data.primaryContactEmail,
+          primary_contact_phone: data.primaryContactPhone || null,
+          account_owner: data.accountOwner || "Unassigned",
+          arr_inr: data.arrInr || 0,
+          notes: data.notes || null,
+          status: data.status || "active"
+        })
+        .eq("id", client.id)
+        .select();
+      if (error) throw error;
+      return clientData;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/crm/clients"] });
       toast({ title: "Client updated" });
       onClose();
     },
-    onError: () => toast({ title: "Could not update", description: "Check required fields.", variant: "destructive" }),
+    onError: (error: Error) => toast({ title: "Could not update", description: error.message || "Check required fields.", variant: "destructive" }),
   });
 
   return (
@@ -259,7 +335,7 @@ function DealFormFields({
         <Label>Client *</Label>
         <Select value={form.clientId} onValueChange={v => setForm({ ...form, clientId: v })} disabled={lockClient}>
           <SelectTrigger data-testid="select-deal-client"><SelectValue placeholder="Choose client" /></SelectTrigger>
-          <SelectContent>{clients.map(c => <SelectItem key={c.id} value={c.id}>{c.companyName}</SelectItem>)}</SelectContent>
+          <SelectContent>{clients.map(c => <SelectItem key={c.id || Math.random().toString()} value={c.id || ""}>{c.companyName}</SelectItem>)}</SelectContent>
         </Select>
       </div>
       <div className="space-y-1.5">
@@ -305,8 +381,20 @@ function NewDealDialog({ clients }: { clients: Client[] }) {
 
   const mutation = useMutation({
     mutationFn: async (data: DealForm) => {
-      const res = await apiRequest("POST", "/api/crm/deals", data);
-      return res.json();
+      const { data: dealData, error } = await supabase
+        .from("deals")
+        .insert([{
+          client_id: data.clientId,
+          title: data.title,
+          stage: data.stage || "qualified",
+          value_inr: data.valueInr || 0,
+          positions: data.positions || 1,
+          owner: data.owner || "Unassigned",
+          notes: data.notes || null
+        }])
+        .select();
+      if (error) throw error;
+      return dealData;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/crm/deals"] });
@@ -314,7 +402,7 @@ function NewDealDialog({ clients }: { clients: Client[] }) {
       setOpen(false);
       setForm({ clientId: "", title: "", stage: "qualified", valueInr: 0, positions: 1, owner: "Unassigned", notes: "" });
     },
-    onError: () => toast({ title: "Could not save", description: "Check required fields and try again.", variant: "destructive" }),
+    onError: (error: Error) => toast({ title: "Could not save", description: error.message || "Check required fields and try again.", variant: "destructive" }),
   });
 
   return (
@@ -358,15 +446,28 @@ function EditDealDialog({ deal, clients, onClose }: { deal: Deal; clients: Clien
 
   const mutation = useMutation({
     mutationFn: async (data: DealForm) => {
-      const res = await apiRequest("PATCH", `/api/crm/deals/${deal.id}`, data);
-      return res.json();
+      const { data: dealData, error } = await supabase
+        .from("deals")
+        .update({
+          client_id: data.clientId,
+          title: data.title,
+          stage: data.stage,
+          value_inr: data.valueInr,
+          positions: data.positions,
+          owner: data.owner,
+          notes: data.notes || null
+        })
+        .eq("id", deal.id)
+        .select();
+      if (error) throw error;
+      return dealData;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/crm/deals"] });
       toast({ title: "Deal updated" });
       onClose();
     },
-    onError: () => toast({ title: "Could not update", variant: "destructive" }),
+    onError: (error: Error) => toast({ title: "Could not update", description: error.message || "Failed to update.", variant: "destructive" }),
   });
 
   return (
@@ -393,14 +494,63 @@ function EditDealDialog({ deal, clients, onClose }: { deal: Deal; clients: Clien
 /* ── Main CRM Workspace ────────────────────────────────────────────────────── */
 export default function CrmWorkspace() {
   const { toast } = useToast();
-  const { data: clients = [], isLoading: clientsLoading } = useQuery<Client[]>({ queryKey: ["/api/crm/clients"] });
-  const { data: deals = [], isLoading: dealsLoading } = useQuery<Deal[]>({ queryKey: ["/api/crm/deals"] });
+  const { data: clients = [], isLoading: clientsLoading } = useQuery<Client[]>({
+    queryKey: ["/api/crm/clients"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("clients")
+        .select("*")
+        .order("company_name", { ascending: true });
+      if (error) throw error;
+      return (data || []).map(row => ({
+        id: row.id,
+        companyId: row.company_id,
+        companyName: row.company_name,
+        industry: row.industry,
+        city: row.city,
+        primaryContactName: row.primary_contact_name,
+        primaryContactEmail: row.primary_contact_email,
+        primaryContactPhone: row.primary_contact_phone || "",
+        status: row.status || "active",
+        accountOwner: row.account_owner || "Unassigned",
+        arrInr: row.arr_inr || 0,
+        notes: row.notes || "",
+      } as Client));
+    }
+  });
+
+  const { data: deals = [], isLoading: dealsLoading } = useQuery<Deal[]>({
+    queryKey: ["/api/crm/deals"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("deals")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data || []).map(row => ({
+        id: row.id,
+        clientId: row.client_id,
+        title: row.title,
+        stage: row.stage || "qualified",
+        valueInr: row.value_inr || 0,
+        positions: row.positions || 1,
+        owner: row.owner || "Unassigned",
+        notes: row.notes || "",
+      } as Deal));
+    }
+  });
 
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [editingDeal, setEditingDeal] = useState<Deal | null>(null);
 
   const deleteClient = useMutation({
-    mutationFn: async (id: string) => apiRequest("DELETE", `/api/crm/clients/${id}`),
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("clients")
+        .delete()
+        .eq("id", id);
+      if (error) throw error;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/crm/clients"] });
       queryClient.invalidateQueries({ queryKey: ["/api/crm/deals"] });
@@ -409,10 +559,12 @@ export default function CrmWorkspace() {
   });
 
   const deleteDeal = useMutation({
-    mutationFn: async (id: string) => apiRequest("DELETE", `/api/crm/deals/${id}`),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/crm/deals"] });
-      toast({ title: "Deal removed" });
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("deals")
+        .delete()
+        .eq("id", id);
+      if (error) throw error;
     },
   });
 
@@ -508,8 +660,8 @@ export default function CrmWorkspace() {
                     </Button>
                     <Button
                       size="icon" variant="ghost"
-                      onClick={() => { if (confirm(`Delete ${c.companyName}? This will also delete its deals.`)) deleteClient.mutate(c.id); }}
-                      data-testid={`button-delete-client-${c.id}`}
+                      onClick={() => { if (confirm(`Delete ${c.companyName}? This will also delete its deals.`)) deleteClient.mutate(c.id || ""); }}
+                      data-testid={`button-delete-client-${c.id || ""}`}
                     >
                       <Trash2 className="h-4 w-4 text-muted-foreground" />
                     </Button>
@@ -561,8 +713,8 @@ export default function CrmWorkspace() {
                     </Button>
                     <Button
                       size="icon" variant="ghost"
-                      onClick={() => { if (confirm(`Delete deal "${d.title}"?`)) deleteDeal.mutate(d.id); }}
-                      data-testid={`button-delete-deal-${d.id}`}
+                      onClick={() => { if (confirm(`Delete deal "${d.title}"?`)) deleteDeal.mutate(d.id || ""); }}
+                      data-testid={`button-delete-deal-${d.id || ""}`}
                     >
                       <Trash2 className="h-4 w-4 text-muted-foreground" />
                     </Button>

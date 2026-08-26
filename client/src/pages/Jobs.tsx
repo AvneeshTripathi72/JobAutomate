@@ -11,6 +11,7 @@ import { Search, Loader2, MapPin, Briefcase, Filter, Bell, X, ArrowRight, BrainC
 import { formatPostedDate } from "@/lib/utils";
 import type { Job } from "@shared/schema";
 import { useDocumentMeta } from "@/hooks/use-document-meta";
+import { supabase } from "@/lib/supabase";
 
 export default function Jobs() {
   useDocumentMeta(
@@ -31,6 +32,25 @@ export default function Jobs() {
 
   const { data: jobs = [], isLoading } = useQuery<Job[]>({
     queryKey: ["/api/jobs"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("jobs")
+        .select("*, companies(name)")
+        .order("posted_date", { ascending: false });
+      if (error) throw error;
+      return (data || []).map(row => ({
+        id: row.id,
+        companyId: row.company_id,
+        title: row.title,
+        company: (row.companies as any)?.name || "Default Company",
+        location: row.location,
+        jobType: row.job_type,
+        industry: row.industry,
+        description: row.description,
+        salary: row.salary,
+        postedDate: row.posted_date ? new Date(row.posted_date) : undefined,
+      } as Job));
+    }
   });
 
   const featuredJobs = [
@@ -240,9 +260,15 @@ export default function Jobs() {
                     <div className="space-y-4">
                       {filteredJobs.map((job) => (
                         <JobCard
-                          key={job.id}
-                          {...job}
-                          postedDate={formatPostedDate(job.postedDate)}
+                          key={job.id || Math.random().toString()}
+                          id={job.id || ""}
+                          title={job.title}
+                          company={job.company}
+                          location={job.location}
+                          jobType={job.jobType}
+                          description={job.description}
+                          salary={job.salary}
+                          postedDate={job.postedDate ? formatPostedDate(job.postedDate) : ""}
                         />
                       ))}
                     </div>

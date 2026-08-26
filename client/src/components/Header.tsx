@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { Menu, X, ChevronDown, LogIn, User, ShieldCheck, Building2, FileText, Lightbulb, Globe, Handshake, Search, LayoutDashboard, IndianRupee } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import tilconsLogo from "@assets/Top_Logo_Tilcons_SkyBlue.png";
+import { TilconsLogo } from "@/components/TilconsLogo";
 import aboutMenuImage from "@assets/generated_images/Hero_office_collaboration_scene_5a689ad5.png";
 
 export default function Header() {
@@ -42,19 +43,9 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full">
-
-      {/* Logo card spanning both ribbon + main bar */}
-      <div className="absolute top-0 left-0 right-0 z-20 pointer-events-none hidden md:block">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <Link href="/" data-testid="link-home-overlay" className="inline-flex items-center pointer-events-auto bg-white border border-border rounded-lg shadow-lg px-4 py-2 mt-2">
-            <img src={tilconsLogo} alt="Tilcons" className="h-16 w-auto object-contain" />
-          </Link>
-        </div>
-      </div>
-
-      {/* ── Top ribbon ── */}
-      <div className="hidden md:block bg-[#0d2137] border-b border-white/10">
+    <>
+      {/* ── Top ribbon (scrolls out of view naturally) ── */}
+      <div className="hidden md:block bg-[#0d2137] border-b border-white/10 w-full">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-end gap-1 h-11">
             <div className="flex items-center gap-1">
@@ -243,25 +234,23 @@ export default function Header() {
         </div>
       </div>
 
-      {/* ── Main header bar ── */}
-      <div className="bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b">
+      {/* ── Sticky main header bar (sticks to the top) ── */}
+      <header className="sticky top-0 z-50 w-full bg-white border-b border-slate-200 shadow-sm">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center gap-4">
 
-            {/* Logo (mobile only — desktop logo is the overlay card spanning both bars) */}
-            <Link href="/" data-testid="link-home" className="flex items-center flex-shrink-0 md:hidden">
-              <img src={tilconsLogo} alt="Tilcons" className="h-12 w-auto object-contain" />
+            {/* Integrated Logo (Desktop & Mobile) */}
+            <Link href="/" data-testid="link-home" className="flex items-center flex-shrink-0">
+              <TilconsLogo className="h-10 md:h-12 w-auto" />
             </Link>
 
-            {/* Desktop spacer to clear the overlay logo card */}
-            <div className="hidden md:block flex-shrink-0" style={{ width: "260px" }} aria-hidden="true" />
-
-            {/* LEFT nav: About · Contact · Salary Guide */}
+            {/* LEFT nav: Home · About · Contact · Salary Guide */}
             <nav className="hidden md:flex items-center gap-1">
+                <Link href="/" data-testid="link-nav-home" className="text-sm font-bold uppercase tracking-wider text-slate-600 hover:text-sky-600 px-3 py-2 rounded-md transition-colors">Home</Link>
 
                 {/* ABOUT mega-menu (Company + Product) */}
                 <div className="relative" {...makeHover(setNavCompanyOpen, navCompanyTimeoutRef)}>
-                  <button data-testid="button-nav-company" className={`flex items-center gap-1 text-sm font-bold uppercase tracking-wider px-3 py-2 rounded-md transition-colors ${navCompanyOpen ? "text-primary" : "text-foreground/70 hover:text-primary"}`}>
+                  <button data-testid="button-nav-company" className={`flex items-center gap-1 text-sm font-bold uppercase tracking-wider px-3 py-2 rounded-md transition-colors ${navCompanyOpen ? "text-sky-600" : "text-slate-600 hover:text-sky-600"}`}>
                     About
                     <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${navCompanyOpen ? "rotate-180" : ""}`} />
                   </button>
@@ -342,9 +331,9 @@ export default function Header() {
                   )}
                 </div>
 
-                <Link href="/contact" data-testid="link-nav-contact" className="text-sm font-bold uppercase tracking-wider text-foreground/70 hover:text-primary px-3 py-2 rounded-md transition-colors">Contact</Link>
+                <Link href="/contact" data-testid="link-nav-contact" className="text-sm font-bold uppercase tracking-wider text-slate-600 hover:text-sky-600 px-3 py-2 rounded-md transition-colors">Contact</Link>
 
-                <Link href="/salary-guide" data-testid="link-nav-salary-guide" className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-foreground border border-border bg-card hover:border-primary hover:text-primary px-3 py-1.5 rounded-md transition-colors ml-1">
+                <Link href="/salary-guide" data-testid="link-nav-salary-guide" className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-slate-700 border border-slate-200 bg-white hover:border-sky-600 hover:text-sky-600 px-3 py-1.5 rounded-md transition-colors ml-1">
                   <IndianRupee className="h-3.5 w-3.5" />
                   Salary Guide
                 </Link>
@@ -356,7 +345,7 @@ export default function Header() {
 
               {/* Mobile hamburger */}
               <button
-                className="md:hidden p-2 text-foreground/70 hover:text-primary transition-colors"
+                className="md:hidden p-2 text-slate-600 hover:text-sky-600 transition-colors"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 data-testid="button-mobile-menu"
               >
@@ -385,6 +374,7 @@ export default function Header() {
                 </div>
                 <div className="space-y-3">
                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider px-2 flex items-center gap-1.5"><Globe className="h-3 w-3" />Company</p>
+                  <Link href="/" className="block px-3 py-2 text-base font-semibold text-foreground hover:text-primary transition-colors">Home</Link>
                   <Link href="/about" className="block px-3 py-2 text-base font-semibold text-foreground hover:text-primary transition-colors">About</Link>
                   <Link href="/contact" className="block px-3 py-2 text-base font-semibold text-foreground hover:text-primary transition-colors">Contact</Link>
                 </div>
@@ -404,8 +394,7 @@ export default function Header() {
             </div>
           )}
         </div>
-      </div>
-
-    </header>
+      </header>
+    </>
   );
 }

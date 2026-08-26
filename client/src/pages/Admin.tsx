@@ -43,6 +43,7 @@ import {
   Plus,
   Globe,
   EyeOff,
+  Download,
   TrendingUp,
   BarChart2,
   ChevronRight,
@@ -69,7 +70,8 @@ import type {
   InsertArticle,
   JobSeeker,
 } from "@shared/schema";
-import logoPath from "@assets/Top_Logo_Tilcons_SkyBlue.png";
+import { TilconsLogo } from "@/components/TilconsLogo";
+import { supabase } from "@/lib/supabase";
 import AtsModule, {
   ATS_MODULE_KEYS,
   ATS_MODULE_META,
@@ -85,6 +87,8 @@ import EmailCalendarWorkspace from "@/components/admin/EmailCalendarWorkspace";
 import AiRecruiterModule from "@/components/admin/AiRecruiterModule";
 import OfferLetterGenerator from "@/components/admin/OfferLetterGenerator";
 import BulkEmailDialog from "@/components/admin/BulkEmailDialog";
+import { ResumeViewerModal, AtsAnalysisModal } from "@/components/admin/ResumeAnalysis";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import {
   ActivityTimeline,
   InterviewsTab,
@@ -390,7 +394,7 @@ function CandidateDetailPanel({
           <div className="flex items-center gap-2">
             {jobSeeker && (
               <HotlistToggleButton
-                jobSeekerId={jobSeeker.id}
+                jobSeekerId={jobSeeker.id || ""}
                 isHotlisted={jobSeeker.isHotlisted ?? false}
               />
             )}
@@ -416,7 +420,7 @@ function CandidateDetailPanel({
                   {label}:
                 </span>
                 <code className="text-xs font-mono font-semibold">
-                  {shortId(val)}
+                  {shortId(val || "")}
                 </code>
               </div>
             ))}
@@ -456,7 +460,7 @@ function CandidateDetailPanel({
               </p>
               <p className="flex items-center gap-1.5 text-sm">
                 <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
-                {formatDate(app.appliedDate)}
+                {app.appliedDate ? formatDate(app.appliedDate) : ""}
               </p>
             </div>
             <div>
@@ -605,22 +609,22 @@ function CandidateDetailPanel({
                     candidateName={app.applicantName}
                     jobTitle={job.title}
                     companyName={job.company}
-                    applicationId={app.id}
+                    applicationId={app.id || ""}
                   />
                 </div>
               )}
             </TabsContent>
 
             <TabsContent value="activity" className="pt-4">
-              <ActivityTimeline applicationId={app.id} />
+              <ActivityTimeline applicationId={app.id || ""} />
             </TabsContent>
 
             <TabsContent value="interviews" className="pt-4">
-              <InterviewsTab applicationId={app.id} />
+              <InterviewsTab applicationId={app.id || ""} />
             </TabsContent>
 
             <TabsContent value="submissions" className="pt-4">
-              <SubmissionsTab applicationId={app.id} />
+              <SubmissionsTab applicationId={app.id || ""} />
             </TabsContent>
           </Tabs>
         </div>
@@ -629,7 +633,7 @@ function CandidateDetailPanel({
           <Button
             className="flex-1 bg-[#0ea5e9] hover:bg-[#0ea5e9] text-white border-0"
             disabled={isPending}
-            onClick={() => onUpdate(app.id, selectedStatus, notes)}
+            onClick={() => onUpdate(app.id || "", selectedStatus, notes)}
             data-testid="button-save-candidate"
           >
             Save Changes
@@ -673,11 +677,11 @@ function KanbanCard({
           <div className="flex items-center gap-2 mt-2 flex-wrap">
             <span className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground bg-muted/60 px-1.5 py-0.5 rounded">
               <Hash className="h-2.5 w-2.5" />
-              {shortId(app.jobId)}
+              {shortId(app.jobId || "")}
             </span>
             <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
               <Calendar className="h-2.5 w-2.5" />
-              {formatDate(app.appliedDate)}
+              {app.appliedDate ? formatDate(app.appliedDate) : ""}
             </span>
           </div>
         </div>
@@ -707,11 +711,73 @@ function ATSView({
 
   const { data: applications = [], isLoading } = useQuery<Application[]>({
     queryKey: ["/api/applications"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("applications")
+        .select("*")
+        .order("applied_date", { ascending: false });
+      if (error) throw error;
+      return (data || []).map(row => ({
+        id: row.id,
+        companyId: row.company_id,
+        jobId: row.job_id,
+        jobTitle: row.job_title || "General Application",
+        applicantName: row.applicant_name,
+        email: row.email,
+        phone: row.phone,
+        resumeUrl: row.resume_url,
+        coverLetter: row.cover_letter,
+        status: row.status || "new",
+        notes: row.notes,
+        appliedDate: row.applied_date ? new Date(row.applied_date) : undefined,
+      } as Application));
+    }
   });
-  const { data: jobs = [] } = useQuery<Job[]>({ queryKey: ["/api/jobs"] });
+
+  const { data: jobs = [] } = useQuery<Job[]>({
+    queryKey: ["/api/jobs"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("jobs")
+        .select("*")
+        .order("posted_date", { ascending: false });
+      if (error) throw error;
+      return (data || []).map(row => ({
+        id: row.id,
+        companyId: row.company_id,
+        title: row.title,
+        company: row.company_id,
+        location: row.location,
+        jobType: row.job_type,
+        industry: row.industry,
+        description: row.description,
+        salary: row.salary,
+        postedDate: row.posted_date ? new Date(row.posted_date) : undefined,
+      } as Job));
+    }
+  });
+
   const { data: jobSeekers = [] } = useQuery<JobSeeker[]>({
     queryKey: ["/api/admin/jobseekers"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("resumes")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data || []).map(row => ({
+        id: row.id,
+        fullName: row.full_name,
+        email: row.email,
+        phone: row.phone,
+        currentPosition: row.desired_position,
+        experienceLevel: `${row.years_experience} Yrs`,
+        createdAt: row.created_at ? new Date(row.created_at) : new Date(),
+        isHotlisted: false
+      } as any));
+    }
   });
+
   const jobMap = new Map(jobs.map((j) => [j.id, j]));
   const seekerMap = new Map(jobSeekers.map((s) => [s.id, s]));
 
@@ -724,7 +790,15 @@ function ATSView({
       id: string;
       status: string;
       notes?: string;
-    }) => apiRequest("PATCH", `/api/applications/${id}`, { status, notes }),
+    }) => {
+      const { data, error } = await supabase
+        .from("applications")
+        .update({ status, notes })
+        .eq("id", id)
+        .select();
+      if (error) throw error;
+      return data;
+    },
     onSuccess: (_, vars) => {
       queryClient.invalidateQueries({ queryKey: ["/api/applications"] });
       toast({ title: "Candidate updated" });
@@ -734,7 +808,7 @@ function ATSView({
           : prev,
       );
     },
-    onError: () => toast({ title: "Failed to update", variant: "destructive" }),
+    onError: (error: Error) => toast({ title: error.message || "Failed to update", variant: "destructive" }),
   });
 
   const filtered = applications.filter((app) => {
@@ -742,7 +816,7 @@ function ATSView({
       !search ||
       app.applicantName.toLowerCase().includes(search.toLowerCase()) ||
       app.email.toLowerCase().includes(search.toLowerCase()) ||
-      app.jobTitle.toLowerCase().includes(search.toLowerCase());
+      (app.jobTitle || "").toLowerCase().includes(search.toLowerCase());
     const matchesJob = filterJobId === "all" || app.jobId === filterJobId;
     return matchesSearch && matchesJob;
   });
@@ -776,7 +850,7 @@ function ATSView({
               All Positions ({applications.length})
             </SelectItem>
             {jobs.map((job) => (
-              <SelectItem key={job.id} value={job.id}>
+              <SelectItem key={job.id || Math.random().toString()} value={job.id || ""}>
                 {job.title} (
                 {applications.filter((a) => a.jobId === job.id).length})
               </SelectItem>
@@ -936,7 +1010,7 @@ function JobCard({
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
   const copyJobId = () => {
-    navigator.clipboard.writeText(job.id).then(() => {
+    navigator.clipboard.writeText(job.id || "").then(() => {
       setCopied(true);
       toast({ title: "Job ID copied" });
       setTimeout(() => setCopied(false), 2000);
@@ -966,11 +1040,11 @@ function JobCard({
             )}
             <button
               onClick={copyJobId}
-              data-testid={`button-copy-jobid-${job.id}`}
+              data-testid={`button-copy-jobid-${job.id || ""}`}
               className="mt-2 flex items-center gap-1.5 px-2 py-1 rounded border border-dashed border-muted-foreground/30 bg-muted/30 hover:bg-muted/60 transition-colors text-xs"
             >
               <Hash className="h-3 w-3 text-muted-foreground" />
-              <code className="font-mono font-semibold">{shortId(job.id)}</code>
+              <code className="font-mono font-semibold">{shortId(job.id || "")}</code>
               {copied ? (
                 <Check className="h-3 w-3 text-emerald-500" />
               ) : (
@@ -984,16 +1058,16 @@ function JobCard({
                 size="icon"
                 variant="ghost"
                 onClick={() => onEdit(job)}
-                data-testid={`button-edit-${job.id}`}
+                data-testid={`button-edit-${job.id || ""}`}
               >
                 <Pencil className="h-4 w-4" />
               </Button>
               <Button
                 size="icon"
                 variant="ghost"
-                onClick={() => onDelete(job.id)}
+                onClick={() => onDelete(job.id || "")}
                 disabled={isDeleting}
-                data-testid={`button-delete-${job.id}`}
+                data-testid={`button-delete-${job.id || ""}`}
               >
                 <Trash2 className="h-4 w-4 text-destructive" />
               </Button>
@@ -1001,8 +1075,8 @@ function JobCard({
             <Button
               size="sm"
               variant="outline"
-              onClick={() => onViewApps(job.id)}
-              data-testid={`button-view-apps-${job.id}`}
+              onClick={() => onViewApps(job.id || "")}
+              data-testid={`button-view-apps-${job.id || ""}`}
               className="text-xs gap-1.5"
             >
               <Users className="h-3 w-3" />
@@ -1055,8 +1129,14 @@ export default function Admin() {
   const [filterJobId, setFilterJobId] = useState("all");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [seekerSearch, setSeekerSearch] = useState("");
-  const [selectedJobSeekers, setSelectedJobSeekers] = useState<number[]>([]);
+  const [selectedJobSeekers, setSelectedJobSeekers] = useState<string[]>([]);
   const [isBulkEmailOpen, setIsBulkEmailOpen] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [activeSeeker, setActiveSeeker] = useState<JobSeeker | null>(null);
+  const [showViewer, setShowViewer] = useState(false);
+  const [showAts, setShowAts] = useState(false);
+  const [noteSeeker, setNoteSeeker] = useState<JobSeeker | null>(null);
+  const [noteText, setNoteText] = useState("");
 
   // Job form
   const [isEditing, setIsEditing] = useState(false);
@@ -1088,51 +1168,209 @@ export default function Admin() {
 
   const { data: jobs = [], isLoading } = useQuery<Job[]>({
     queryKey: ["/api/jobs"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("jobs")
+        .select("*, companies(name)")
+        .order("posted_date", { ascending: false });
+      if (error) throw error;
+      return (data || []).map(row => ({
+        id: row.id,
+        companyId: row.company_id,
+        title: row.title,
+        company: (row.companies as any)?.name || "Default Company",
+        location: row.location,
+        jobType: row.job_type,
+        industry: row.industry,
+        description: row.description,
+        salary: row.salary,
+        postedDate: row.posted_date ? new Date(row.posted_date) : undefined,
+      } as Job));
+    }
   });
+
   const { data: applications = [] } = useQuery<Application[]>({
     queryKey: ["/api/applications"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("applications")
+        .select("*")
+        .order("applied_date", { ascending: false });
+      if (error) throw error;
+      return (data || []).map(row => ({
+        id: row.id,
+        companyId: row.company_id,
+        jobId: row.job_id,
+        jobTitle: row.job_title || "General Application",
+        applicantName: row.applicant_name,
+        email: row.email,
+        phone: row.phone,
+        resumeUrl: row.resume_url,
+        coverLetter: row.cover_letter,
+        status: row.status || "new",
+        notes: row.notes,
+        appliedDate: row.applied_date ? new Date(row.applied_date) : undefined,
+      } as Application));
+    }
   });
-  const { data: articles = [], isLoading: articlesLoading } = useQuery<
-    Article[]
-  >({ queryKey: ["/api/admin/articles"] });
-  const { data: jobSeekers = [], isLoading: jobSeekersLoading } = useQuery<
-    JobSeeker[]
-  >({ queryKey: ["/api/admin/jobseekers"] });
+
+  const { data: articles = [], isLoading: articlesLoading } = useQuery<Article[]>({
+    queryKey: ["/api/admin/articles"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("articles")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data || []).map(row => ({
+        id: row.id,
+        title: row.title,
+        category: row.category,
+        excerpt: row.excerpt,
+        content: row.content,
+        author: row.author,
+        readTime: row.read_time,
+        published: row.published,
+      } as Article));
+    }
+  });
+
+  const { data: jobSeekers = [], isLoading: jobSeekersLoading } = useQuery<JobSeeker[]>({
+    queryKey: ["/api/admin/jobseekers"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("resumes")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data || []).map(row => ({
+        id: row.id,
+        fullName: row.full_name,
+        email: row.email,
+        phone: row.phone,
+        currentPosition: row.desired_position,
+        experienceLevel: `${row.years_experience} Yrs`,
+        createdAt: row.created_at ? new Date(row.created_at) : new Date(),
+        isHotlisted: row.is_hotlisted ?? false,
+        additionalInfo: row.additional_info || "",
+        resumeUrl: row.resume_url || null
+      } as any));
+    }
+  });
 
   const handleLogout = () => {
     logoutMutation.mutate(undefined, { onSuccess: () => setLocation("/auth") });
   };
 
   const createMutation = useMutation({
-    mutationFn: async (data: InsertJob) =>
-      apiRequest("POST", "/api/jobs", data),
+    mutationFn: async (data: InsertJob) => {
+      // 1. Find or create company
+      let { data: companyData } = await supabase
+        .from("companies")
+        .select("id")
+        .eq("name", data.company)
+        .maybeSingle();
+      
+      let companyId;
+      if (companyData) {
+        companyId = companyData.id;
+      } else {
+        const { data: newComp, error: insertCompErr } = await supabase
+          .from("companies")
+          .insert([{ name: data.company }])
+          .select()
+          .single();
+        if (insertCompErr) throw insertCompErr;
+        companyId = newComp.id;
+      }
+
+      // 2. Insert Job
+      const { data: jobData, error: jobErr } = await supabase
+        .from("jobs")
+        .insert([{
+          company_id: companyId,
+          title: data.title,
+          location: data.location,
+          job_type: data.jobType,
+          industry: data.industry,
+          description: data.description,
+          salary: data.salary || null
+        }])
+        .select();
+      if (jobErr) throw jobErr;
+      return jobData;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/jobs"] });
       toast({ title: "Job created" });
       resetForm();
     },
-    onError: () =>
-      toast({ title: "Failed to create job", variant: "destructive" }),
+    onError: (error: Error) =>
+      toast({ title: error.message || "Failed to create job", variant: "destructive" }),
   });
+
   const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: InsertJob }) =>
-      apiRequest("PUT", `/api/jobs/${id}`, data),
+    mutationFn: async ({ id, data }: { id: string; data: InsertJob }) => {
+      // 1. Find or create company
+      let { data: companyData } = await supabase
+        .from("companies")
+        .select("id")
+        .eq("name", data.company)
+        .maybeSingle();
+      
+      let companyId;
+      if (companyData) {
+        companyId = companyData.id;
+      } else {
+        const { data: newComp, error: insertCompErr } = await supabase
+          .from("companies")
+          .insert([{ name: data.company }])
+          .select()
+          .single();
+        if (insertCompErr) throw insertCompErr;
+        companyId = newComp.id;
+      }
+
+      // 2. Update Job
+      const { data: jobData, error: jobErr } = await supabase
+        .from("jobs")
+        .update({
+          company_id: companyId,
+          title: data.title,
+          location: data.location,
+          job_type: data.jobType,
+          industry: data.industry,
+          description: data.description,
+          salary: data.salary || null
+        })
+        .eq("id", id)
+        .select();
+      if (jobErr) throw jobErr;
+      return jobData;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/jobs"] });
       toast({ title: "Job updated" });
       resetForm();
     },
-    onError: () =>
-      toast({ title: "Failed to update job", variant: "destructive" }),
+    onError: (error: Error) =>
+      toast({ title: error.message || "Failed to update job", variant: "destructive" }),
   });
+
   const deleteMutation = useMutation({
-    mutationFn: async (id: string) => apiRequest("DELETE", `/api/jobs/${id}`),
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("jobs")
+        .delete()
+        .eq("id", id);
+      if (error) throw error;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/jobs"] });
       toast({ title: "Job deleted" });
     },
-    onError: () =>
-      toast({ title: "Failed to delete job", variant: "destructive" }),
+    onError: (error: Error) =>
+      toast({ title: error.message || "Failed to delete job", variant: "destructive" }),
   });
 
   const resetForm = () => {
@@ -1150,36 +1388,72 @@ export default function Admin() {
   };
 
   const createArticleMutation = useMutation({
-    mutationFn: async (data: InsertArticle) =>
-      apiRequest("POST", "/api/articles", data),
+    mutationFn: async (data: InsertArticle) => {
+      const { data: articleData, error } = await supabase
+        .from("articles")
+        .insert([{
+          title: data.title,
+          category: data.category,
+          excerpt: data.excerpt,
+          content: data.content,
+          author: data.author || "Tilcons Team",
+          read_time: data.readTime || "3 min read",
+          published: data.published ?? true
+        }])
+        .select();
+      if (error) throw error;
+      return articleData;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/articles"] });
       toast({ title: "Article created" });
       resetArticleForm();
     },
-    onError: () =>
-      toast({ title: "Failed to create article", variant: "destructive" }),
+    onError: (error: Error) =>
+      toast({ title: error.message || "Failed to create article", variant: "destructive" }),
   });
+
   const updateArticleMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: InsertArticle }) =>
-      apiRequest("PATCH", `/api/articles/${id}`, data),
+    mutationFn: async ({ id, data }: { id: string; data: InsertArticle }) => {
+      const { data: articleData, error } = await supabase
+        .from("articles")
+        .update({
+          title: data.title,
+          category: data.category,
+          excerpt: data.excerpt,
+          content: data.content,
+          author: data.author || "Tilcons Team",
+          read_time: data.readTime || "3 min read",
+          published: data.published ?? true
+        })
+        .eq("id", id)
+        .select();
+      if (error) throw error;
+      return articleData;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/articles"] });
       toast({ title: "Article updated" });
       resetArticleForm();
     },
-    onError: () =>
-      toast({ title: "Failed to update article", variant: "destructive" }),
+    onError: (error: Error) =>
+      toast({ title: error.message || "Failed to update article", variant: "destructive" }),
   });
+
   const deleteArticleMutation = useMutation({
-    mutationFn: async (id: string) =>
-      apiRequest("DELETE", `/api/articles/${id}`),
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("articles")
+        .delete()
+        .eq("id", id);
+      if (error) throw error;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/articles"] });
       toast({ title: "Article deleted" });
     },
-    onError: () =>
-      toast({ title: "Failed to delete article", variant: "destructive" }),
+    onError: (error: Error) =>
+      toast({ title: error.message || "Failed to delete article", variant: "destructive" }),
   });
 
   const resetArticleForm = () => {
@@ -1204,7 +1478,7 @@ export default function Admin() {
     e.preventDefault();
     if (isArticleEditing && editingArticle)
       updateArticleMutation.mutate({
-        id: editingArticle.id,
+        id: editingArticle.id || "",
         data: articleForm,
       });
     else createArticleMutation.mutate(articleForm);
@@ -1231,7 +1505,7 @@ export default function Admin() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isEditing && editingJob)
-      updateMutation.mutate({ id: editingJob.id, data: formData });
+      updateMutation.mutate({ id: editingJob.id || "", data: formData });
     else createMutation.mutate(formData);
   };
   const handleDelete = (id: string) => {
@@ -1260,7 +1534,7 @@ export default function Admin() {
           .filter((a) => a.status === "hired")
           .reduce((acc, a) => {
             const days =
-              (new Date().getTime() - new Date(a.appliedDate).getTime()) /
+              (new Date().getTime() - new Date(a.appliedDate || new Date()).getTime()) /
               (1000 * 3600 * 24);
             return acc + days;
           }, 0) / hiredCount
@@ -1291,11 +1565,7 @@ export default function Admin() {
       {/* Logo */}
       <div className="px-5 py-5 border-b border-white/10">
         <div className="bg-white rounded-md px-3 py-2 inline-block">
-          <img
-            src={logoPath}
-            alt="Tilcons"
-            className="h-7 w-auto object-contain"
-          />
+          <TilconsLogo className="h-7" />
         </div>
         <p
           className="text-white/40 text-[10px] uppercase tracking-widest mt-3 font-semibold"
@@ -1389,11 +1659,11 @@ export default function Admin() {
       <div className="px-3 py-4 border-t border-white/10">
         <div className="flex items-center gap-3 px-3 py-2">
           <div className="h-8 w-8 rounded-full bg-[#0ea5e9] flex items-center justify-center text-white text-xs font-bold shrink-0">
-            {user?.username?.[0]?.toUpperCase() ?? "A"}
+            {user?.email?.[0]?.toUpperCase() ?? "A"}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-white text-sm font-semibold truncate">
-              {user?.username ?? "Admin"}
+              {user?.email?.split('@')[0] ?? "Admin"}
             </p>
             <p className="text-white/40 text-xs truncate">Administrator</p>
           </div>
@@ -1467,18 +1737,89 @@ export default function Admin() {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Button size="icon" variant="ghost">
-              <Bell className="h-4 w-4" />
-            </Button>
-            <Button
-              size="icon"
-              variant="ghost"
-              onClick={() => setLocation("/")}
-            >
-              <Globe className="h-4 w-4" />
-            </Button>
-          </div>
+          {/* Live notifications list compiled directly from Supabase query data */}
+          {(() => {
+            const list = [
+              ...applications.map(app => ({
+                id: `app-${app.id}`,
+                title: "New Application",
+                description: `${app.applicantName} applied for ${app.jobTitle || "a job"}`,
+                time: app.appliedDate ? new Date(app.appliedDate) : new Date(),
+              })),
+              ...jobSeekers.map(seeker => ({
+                id: `seeker-${seeker.id}`,
+                title: "New Candidate",
+                description: `${seeker.fullName} registered as ${seeker.currentPosition || "General Candidate"}`,
+                time: seeker.createdAt ? new Date(seeker.createdAt) : new Date(),
+              }))
+            ].sort((a, b) => b.time.getTime() - a.time.getTime()).slice(0, 5);
+
+            return (
+              <div className="flex items-center gap-2 relative">
+                <div className="relative">
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => setShowNotifications(!showNotifications)}
+                    className="relative"
+                    data-testid="button-bell"
+                  >
+                    <Bell className="h-4 w-4" />
+                    {list.length > 0 && (
+                      <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                    )}
+                  </Button>
+
+                  {showNotifications && (
+                    <div 
+                      className="absolute right-0 mt-2 w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-lg z-50 py-2 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150"
+                      data-testid="notifications-dropdown"
+                    >
+                      <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                        <span className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Live Activity</span>
+                        <button 
+                          onClick={() => setShowNotifications(false)}
+                          className="text-[10px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 font-medium"
+                        >
+                          Close
+                        </button>
+                      </div>
+                      <div className="divide-y divide-slate-50 dark:divide-slate-800 max-h-80 overflow-y-auto">
+                        {list.length === 0 ? (
+                          <div className="px-4 py-8 text-center text-xs text-slate-400">
+                            No recent activity found.
+                          </div>
+                        ) : (
+                          list.map((item) => (
+                            <div key={item.id} className="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors text-left">
+                              <div className="flex justify-between items-start gap-1.5">
+                                <p className="text-xs font-bold text-slate-800 dark:text-slate-200">{item.title}</p>
+                                <span className="text-[9px] text-slate-400 whitespace-nowrap">
+                                  {Math.max(0, Math.floor((Date.now() - item.time.getTime()) / 60000)) < 60
+                                    ? `${Math.max(1, Math.floor((Date.now() - item.time.getTime()) / 60000))}m ago`
+                                    : item.time.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                                </span>
+                              </div>
+                              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">{item.description}</p>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => window.open("/", "_blank")}
+                  title="Open Public Careers Site"
+                  data-testid="button-globe"
+                >
+                  <Globe className="h-4 w-4" />
+                </Button>
+              </div>
+            );
+          })()}
         </header>
 
         {/* Scrollable content area */}
@@ -2069,26 +2410,26 @@ export default function Admin() {
                       })
                       .map((seeker) => (
                         <Card
-                          key={seeker.id}
-                          className={`border ${selectedJobSeekers.includes(seeker.id) ? "border-[#0ea5e9] shadow-md ring-1 ring-[#0ea5e9]/30" : "border-0 shadow-sm"} hover-elevate transition-all`}
-                          data-testid={`card-jobseeker-${seeker.id}`}
+                          key={seeker.id || Math.random().toString()}
+                          className={`border ${selectedJobSeekers.includes(seeker.id || "") ? "border-[#0ea5e9] shadow-md ring-1 ring-[#0ea5e9]/30" : "border-0 shadow-sm"} hover-elevate transition-all`}
+                          data-testid={`card-jobseeker-${seeker.id || ""}`}
                         >
                           <CardContent className="p-4">
                             <div className="flex items-start gap-4 flex-wrap">
                               <div className="pt-2">
                                 <Checkbox
                                   checked={selectedJobSeekers.includes(
-                                    seeker.id,
+                                    seeker.id || "",
                                   )}
                                   onCheckedChange={(checked) => {
                                     if (checked)
                                       setSelectedJobSeekers((prev) => [
                                         ...prev,
-                                        seeker.id,
+                                        seeker.id || "",
                                       ]);
                                     else
                                       setSelectedJobSeekers((prev) =>
-                                        prev.filter((id) => id !== seeker.id),
+                                        prev.filter((id) => id !== (seeker.id || "")),
                                       );
                                   }}
                                 />
@@ -2102,7 +2443,7 @@ export default function Admin() {
                                 <div className="flex items-center gap-2 flex-wrap">
                                   <h3
                                     className="text-sm font-bold text-foreground"
-                                    data-testid={`text-jobseeker-name-${seeker.id}`}
+                                    data-testid={`text-jobseeker-name-${seeker.id || ""}`}
                                   >
                                     {seeker.fullName}
                                   </h3>
@@ -2115,7 +2456,7 @@ export default function Admin() {
                                 {seeker.currentPosition && (
                                   <p
                                     className="text-xs text-muted-foreground mt-0.5"
-                                    data-testid={`text-jobseeker-position-${seeker.id}`}
+                                    data-testid={`text-jobseeker-position-${seeker.id || ""}`}
                                   >
                                     {seeker.currentPosition}
                                   </p>
@@ -2124,7 +2465,7 @@ export default function Admin() {
                                   <a
                                     href={`mailto:${seeker.email}`}
                                     className="flex items-center gap-1.5 hover:text-[#0ea5e9]"
-                                    data-testid={`link-jobseeker-email-${seeker.id}`}
+                                    data-testid={`link-jobseeker-email-${seeker.id || ""}`}
                                   >
                                     <Mail className="h-3.5 w-3.5" />{" "}
                                     {seeker.email}
@@ -2133,7 +2474,7 @@ export default function Admin() {
                                     <a
                                       href={`tel:${seeker.phone}`}
                                       className="flex items-center gap-1.5 hover:text-[#0ea5e9]"
-                                      data-testid={`link-jobseeker-phone-${seeker.id}`}
+                                      data-testid={`link-jobseeker-phone-${seeker.id || ""}`}
                                     >
                                       <Phone className="h-3.5 w-3.5" />{" "}
                                       {seeker.phone}
@@ -2141,14 +2482,93 @@ export default function Admin() {
                                   )}
                                   <span className="flex items-center gap-1.5">
                                     <Calendar className="h-3.5 w-3.5" />{" "}
-                                    Registered {formatDate(seeker.createdAt)}
+                                    Registered {seeker.createdAt ? formatDate(seeker.createdAt) : ""}
                                   </span>
                                 </div>
                               </div>
-                              <HotlistToggleButton
-                                jobSeekerId={seeker.id}
-                                isHotlisted={seeker.isHotlisted ?? false}
-                              />
+                              <div className="flex items-center gap-1.5 shrink-0 ml-auto flex-wrap">
+                                <Button 
+                                  size="sm" variant="ghost" className="h-8 text-xs font-semibold hover:bg-slate-100 hover:text-slate-900"
+                                  onClick={() => {
+                                    setActiveSeeker(seeker);
+                                    setShowViewer(true);
+                                  }}
+                                  data-testid={`button-view-seeker-${seeker.id || ""}`}
+                                >
+                                  <Eye className="h-3.5 w-3.5 mr-1" /> View
+                                </Button>
+                                <Button 
+                                  size="sm" variant="ghost" className="h-8 text-xs font-semibold hover:bg-slate-100 hover:text-slate-900"
+                                  onClick={() => seeker.resumeUrl ? window.open(seeker.resumeUrl, "_blank") : toast({ title: "No resume file uploaded yet" })}
+                                  data-testid={`button-download-seeker-${seeker.id || ""}`}
+                                >
+                                  <Download className="h-3.5 w-3.5 mr-1" /> Download
+                                </Button>
+                                <Button 
+                                  size="sm" variant="ghost" className="h-8 text-xs font-semibold text-[#0ea5e9] hover:bg-[#0ea5e9]/10 hover:text-[#0ea5e9]"
+                                  onClick={() => {
+                                    setActiveSeeker(seeker);
+                                    setShowAts(true);
+                                  }}
+                                  data-testid={`button-ats-seeker-${seeker.id || ""}`}
+                                >
+                                  <Sparkles className="h-3.5 w-3.5 mr-1" /> ATS Analysis
+                                </Button>
+                                <Button 
+                                  size="sm" variant="ghost" className="h-8 text-xs font-semibold hover:bg-slate-100 hover:text-slate-900"
+                                  onClick={() => {
+                                    setNoteSeeker(seeker);
+                                    setNoteText(seeker.additionalInfo || "");
+                                  }}
+                                  data-testid={`button-notes-seeker-${seeker.id || ""}`}
+                                >
+                                  <FileText className="h-3.5 w-3.5 mr-1" /> Notes
+                                </Button>
+                                <Button 
+                                  size="sm" variant="ghost" className="h-8 text-xs font-semibold text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/20"
+                                  onClick={async () => {
+                                    try {
+                                      const { error } = await supabase
+                                        .from("resumes")
+                                        .update({ is_hotlisted: true })
+                                        .eq("id", seeker.id || "");
+                                      if (error) throw error;
+                                      toast({ title: "Candidate shortlisted", description: `${seeker.fullName} has been added to the shortlist.` });
+                                      queryClient.invalidateQueries({ queryKey: ["/api/admin/jobseekers"] });
+                                    } catch (err) {
+                                      toast({ title: "Failed to shortlist candidate", variant: "destructive" });
+                                    }
+                                  }}
+                                  data-testid={`button-shortlist-seeker-${seeker.id || ""}`}
+                                >
+                                  <Star className="h-3.5 w-3.5 mr-1 fill-current" /> Shortlist
+                                </Button>
+                                <Button 
+                                  size="sm" variant="ghost" className="h-8 text-xs font-semibold text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/20"
+                                  onClick={async () => {
+                                    if (confirm(`Are you sure you want to reject candidate ${seeker.fullName}?`)) {
+                                      try {
+                                        const { error } = await supabase
+                                          .from("resumes")
+                                          .delete()
+                                          .eq("id", seeker.id || "");
+                                        if (error) throw error;
+                                        toast({ title: "Candidate rejected and removed", variant: "destructive" });
+                                        queryClient.invalidateQueries({ queryKey: ["/api/admin/jobseekers"] });
+                                      } catch (err) {
+                                        toast({ title: "Failed to reject candidate", variant: "destructive" });
+                                      }
+                                    }
+                                  }}
+                                  data-testid={`button-reject-seeker-${seeker.id || ""}`}
+                                >
+                                  <X className="h-3.5 w-3.5 mr-1" /> Reject
+                                </Button>
+                                <HotlistToggleButton
+                                  jobSeekerId={seeker.id || ""}
+                                  isHotlisted={seeker.isHotlisted ?? false}
+                                />
+                              </div>
                             </div>
                           </CardContent>
                         </Card>
@@ -2177,7 +2597,7 @@ export default function Admin() {
                   open={isBulkEmailOpen}
                   onOpenChange={setIsBulkEmailOpen}
                   selectedEmails={jobSeekers
-                    .filter((s) => selectedJobSeekers.includes(s.id))
+                    .filter((s) => selectedJobSeekers.includes(s.id || ""))
                     .map((s) => s.email)}
                   onSuccess={() => setSelectedJobSeekers([])}
                 />
@@ -2185,7 +2605,6 @@ export default function Admin() {
             </div>
           )}
 
-          {/* ── Articles ── */}
           {activeTab === "articles" && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl">
               <Card className="border-0 shadow-sm">
@@ -2445,7 +2864,7 @@ export default function Admin() {
                               <Button
                                 size="icon"
                                 variant="ghost"
-                                onClick={() => handleDeleteArticle(article.id)}
+                                onClick={() => handleDeleteArticle(article.id || "")}
                                 disabled={deleteArticleMutation.isPending}
                                 data-testid={`button-delete-article-${article.id}`}
                               >
@@ -2469,6 +2888,75 @@ export default function Admin() {
           )}
         </main>
       </div>
+
+      {activeSeeker && (
+        <ResumeViewerModal
+          seeker={activeSeeker}
+          open={showViewer}
+          onClose={() => {
+            setShowViewer(false);
+            setActiveSeeker(null);
+          }}
+          onAtsClick={() => {
+            setShowViewer(false);
+            setShowAts(true);
+          }}
+        />
+      )}
+
+      {activeSeeker && (
+        <AtsAnalysisModal
+          seeker={activeSeeker}
+          open={showAts}
+          onClose={() => {
+            setShowAts(false);
+            setActiveSeeker(null);
+          }}
+        />
+      )}
+
+      {noteSeeker && (
+        <Dialog open onOpenChange={(o: boolean) => !o && setNoteSeeker(null)}>
+          <DialogContent className="max-w-sm bg-white dark:bg-slate-900 border rounded-xl shadow-lg">
+            <DialogHeader>
+              <DialogTitle className="text-base font-bold">Notes - {noteSeeker.fullName}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-3 pt-2">
+              <Label className="text-xs font-bold text-muted-foreground uppercase">Candidate Notes</Label>
+              <Textarea
+                value={noteText}
+                onChange={(e) => setNoteText(e.target.value)}
+                placeholder="Type internal recruiter notes here..."
+                rows={5}
+                className="text-xs"
+              />
+            </div>
+            <div className="flex justify-end gap-2 mt-4 pt-2 border-t">
+              <Button variant="outline" size="sm" onClick={() => setNoteSeeker(null)}>Cancel</Button>
+              <Button 
+                size="sm"
+                onClick={async () => {
+                  try {
+                    const { error } = await supabase
+                      .from("resumes")
+                      .update({ additional_info: noteText })
+                      .eq("id", noteSeeker.id || "");
+                    if (error) throw error;
+                    toast({ title: "Notes updated successfully" });
+                    queryClient.invalidateQueries({ queryKey: ["/api/admin/jobseekers"] });
+                    setNoteSeeker(null);
+                  } catch (err) {
+                    toast({ title: "Failed to save notes", variant: "destructive" });
+                  }
+                }}
+                className="bg-[#0ea5e9] hover:bg-[#0ea5e9]/95 text-white font-bold"
+              >
+                Save Notes
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

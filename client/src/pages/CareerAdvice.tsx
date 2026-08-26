@@ -50,7 +50,7 @@ function ArticleModal({ article, onClose }: { article: Article; onClose: () => v
             <span className="flex items-center gap-1.5">
               <Clock className="h-4 w-4" /> {article.readTime}
             </span>
-            <span>{formatDate(article.publishedDate)}</span>
+            <span>{article.publishedDate ? formatDate(article.publishedDate) : ""}</span>
           </div>
 
           <div className="prose prose-gray max-w-none space-y-5">
@@ -110,7 +110,7 @@ function ArticleCard({ article, onClick }: { article: Article; onClick: () => vo
             <span className="flex items-center gap-1">
               <Clock className="h-3.5 w-3.5" /> {article.readTime}
             </span>
-            <span>{formatDate(article.publishedDate)}</span>
+            <span>{article.publishedDate ? formatDate(article.publishedDate) : ""}</span>
           </div>
           <span className="flex items-center gap-1 text-sky-500 font-bold text-xs uppercase tracking-wide group-hover:gap-2 transition-all">
             Read More <ArrowRight className="h-3 w-3" />

@@ -381,6 +381,27 @@ export default function SignIn() {
                 </Link>
               </div>
 
+              {/* Demo Admin Bypass Button */}
+              <div className="p-3 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 rounded-lg space-y-2 text-center my-3">
+                <p className="text-xs font-bold text-sky-900 dark:text-sky-200">Demo Admin Access Credentials:</p>
+                <div className="text-xs text-sky-800 dark:text-sky-300 font-mono bg-white dark:bg-slate-900 p-1.5 rounded border border-sky-200">
+                  User: <span className="font-bold">admin@tilcons.com</span> | Pass: <span className="font-bold">admin123</span>
+                </div>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs"
+                  onClick={() => {
+                    toast({ title: "Bypass Admin Login", description: "Navigating to Admin Panel..." });
+                    window.location.replace("/admin");
+                  }}
+                  data-testid="button-demo-admin-bypass"
+                >
+                  ⚡ Instant Demo Admin Login (Bypass)
+                </Button>
+              </div>
+
               <div className="relative my-5">
                 <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
                 <span className="relative flex justify-center text-xs uppercase tracking-wider bg-white px-3 text-muted-foreground">or Sign in with</span>

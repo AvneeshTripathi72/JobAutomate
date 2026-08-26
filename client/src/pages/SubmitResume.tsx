@@ -13,6 +13,8 @@ import { Link, useRoute } from "wouter";
 import type { Job } from "@shared/schema";
 import { useDocumentMeta } from "@/hooks/use-document-meta";
 
+import { supabase } from "@/lib/supabase";
+
 const NAVY = "#0d2137";
 const SKY = "#0ea5e9";
 
@@ -23,6 +25,26 @@ export default function SubmitResume() {
 
   const { data: job, isLoading: jobLoading, isError: jobError } = useQuery<Job>({
     queryKey: ["/api/jobs", jobId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("jobs")
+        .select("*")
+        .eq("id", jobId)
+        .single();
+      if (error) throw error;
+      return {
+        id: data.id,
+        companyId: data.company_id,
+        title: data.title,
+        company: data.company_id, // Fetching placeholder
+        location: data.location,
+        jobType: data.job_type,
+        industry: data.industry,
+        description: data.description,
+        salary: data.salary,
+        postedDate: new Date(data.posted_date)
+      } as Job;
+    },
     enabled: !!jobId,
   });
 
@@ -55,33 +77,46 @@ export default function SubmitResume() {
   const submitMutation = useMutation({
     mutationFn: async (data: any) => {
       if (jobId) {
-        return await apiRequest("POST", "/api/applications", {
-          jobId: jobId,
-          jobTitle: job?.title || data.desiredPosition,
-          applicantName: data.fullName,
-          email: data.email,
-          phone: data.phone,
-          resumeUrl: data.resumeFile?.data,
-          coverLetter: data.additionalInfo,
-          source: "Direct"
-        });
+        const { data: resData, error } = await supabase
+          .from("applications")
+          .insert([{
+            company_id: job?.companyId || null,
+            job_id: jobId,
+            applicant_name: data.fullName,
+            email: data.email,
+            phone: data.phone,
+            resume_url: data.resumeFile?.filename || null,
+            cover_letter: data.additionalInfo,
+            status: "new",
+            source: "Direct"
+          }])
+          .select();
+        if (error) throw error;
+        return resData;
+      } else {
+        const { data: resData, error } = await supabase
+          .from("resumes")
+          .insert([{
+            company_id: null,
+            full_name: data.fullName,
+            email: data.email,
+            phone: data.phone,
+            desired_position: data.desiredPosition,
+            years_experience: data.yearsExperience,
+            skills: data.skills,
+            linked_in: data.linkedIn,
+            additional_info: data.additionalInfo,
+            resume_url: data.resumeFile?.filename || null
+          }])
+          .select();
+        if (error) throw error;
+        return resData;
       }
-      return await apiRequest("POST", "/api/resumes", data);
     },
-    onSuccess: async (response: Response) => {
-      let emailSent = true;
-      try {
-        const body = (await response.json()) as { emailSent?: boolean };
-        emailSent = body?.emailSent !== false;
-      } catch {
-        // body parse failed — assume sent so we don't scare the user
-      }
+    onSuccess: async () => {
       toast({
         title: jobId ? "Application submitted!" : "Resume submitted!",
-        description: emailSent
-          ? "Thank you — we've received your details and emailed our recruitment team. We'll be in touch soon."
-          : "Your details are saved, but our notification email is delayed. Our team will still review your profile shortly.",
-        variant: emailSent ? "default" : "destructive",
+        description: "Thank you — we've received your details and our recruitment team will review your profile shortly.",
       });
       setFormData({
         fullName: "",
@@ -95,10 +130,10 @@ export default function SubmitResume() {
       });
       setResumeFile(null);
     },
-    onError: () => {
+    onError: (error: Error) => {
       toast({
         title: "Submission failed",
-        description: "Failed to submit your application. Please try again.",
+        description: error.message || "Failed to submit your application. Please try again.",
         variant: "destructive",
       });
     },

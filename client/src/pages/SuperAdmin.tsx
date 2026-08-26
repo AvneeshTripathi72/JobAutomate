@@ -242,7 +242,7 @@ export default function SuperAdmin() {
               <ShieldCheck className="h-3.5 w-3.5" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white text-xs font-semibold truncate">{user?.username}</p>
+              <p className="text-white text-xs font-semibold truncate">{user?.email?.split('@')[0] ?? "Super Admin"}</p>
               <p className="text-white/40 text-[10px]">Super Admin</p>
             </div>
           </div>
@@ -321,24 +321,24 @@ export default function SuperAdmin() {
                       {companies.map(c => (
                         <div key={c.id} className="px-5 py-3.5 flex items-center gap-4" data-testid={`row-company-${c.id}`}>
                           <div className="w-10 h-10 rounded-lg bg-sky-500/10 text-sky-500 flex items-center justify-center text-xs font-black">
-                            {c.name.split(" ").map(p => p[0]).slice(0, 2).join("").toUpperCase()}
+                            {c.name.split(" ").map((p: string) => p[0]).slice(0, 2).join("").toUpperCase()}
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-bold truncate">{c.name}</p>
-                            <p className="text-xs text-muted-foreground truncate">{c.domain ?? "No domain"} · Joined {new Date(c.createdAt).toLocaleDateString("en-IN")}</p>
+                            <p className="text-xs text-muted-foreground truncate">{c.domain ?? "No domain"} · Joined {c.createdAt ? new Date(c.createdAt).toLocaleDateString("en-IN") : ""}</p>
                           </div>
-                          <Badge style={{ backgroundColor: `${PLAN_COLORS[c.plan]}18`, color: PLAN_COLORS[c.plan], borderColor: `${PLAN_COLORS[c.plan]}40` }} className="border text-[10px] uppercase">{c.plan}</Badge>
+                          <Badge style={{ backgroundColor: `${PLAN_COLORS[c.plan || "free"]}18`, color: PLAN_COLORS[c.plan || "free"], borderColor: `${PLAN_COLORS[c.plan || "free"]}40` }} className="border text-[10px] uppercase">{c.plan || "free"}</Badge>
                           <Badge variant={c.isActive ? "default" : "secondary"} className="text-[10px] uppercase">
                             {c.isActive ? "Active" : "Suspended"}
                           </Badge>
-                          <Button size="icon" variant="ghost" onClick={() => setViewUsers(c)} title="View users" data-testid={`button-view-users-${c.id}`}>
+                          <Button size="icon" variant="ghost" onClick={() => setViewUsers(c)} title="View users" data-testid={`button-view-users-${c.id || ""}`}>
                             <Eye className="h-4 w-4 text-muted-foreground" />
                           </Button>
                           <Button
                             size="icon" variant="ghost"
-                            onClick={() => toggleActive.mutate({ id: c.id, isActive: !c.isActive })}
+                            onClick={() => toggleActive.mutate({ id: c.id || "", isActive: !c.isActive })}
                             title={c.isActive ? "Suspend" : "Activate"}
-                            data-testid={`button-toggle-${c.id}`}
+                            data-testid={`button-toggle-${c.id || ""}`}
                           >
                             {c.isActive
                               ? <XCircle className="h-4 w-4 text-amber-500" />
@@ -346,8 +346,8 @@ export default function SuperAdmin() {
                           </Button>
                           <Button
                             size="icon" variant="ghost"
-                            onClick={() => { if (confirm(`Permanently delete ${c.name} and all its users?`)) deleteCompany.mutate(c.id); }}
-                            data-testid={`button-delete-company-${c.id}`}
+                            onClick={() => { if (confirm(`Permanently delete ${c.name} and all its users?`)) deleteCompany.mutate(c.id || ""); }}
+                            data-testid={`button-delete-company-${c.id || ""}`}
                           >
                             <Trash2 className="h-4 w-4 text-muted-foreground" />
                           </Button>

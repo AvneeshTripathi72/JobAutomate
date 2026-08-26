@@ -250,12 +250,12 @@ export default function BackgroundChecksWorkspace() {
               {checks.map((c) => (
                 <div key={c.id} className="px-5 py-3 flex items-center gap-4 hover-elevate group">
                   <div className="w-9 h-9 rounded-full bg-sky-500/10 text-sky-500 flex items-center justify-center text-xs font-black shrink-0">
-                    {c.candidateName.split(" ").map(p => p[0]).join("").slice(0, 2).toUpperCase()}
+                    {c.candidateName.split(" ").map((p: string) => p[0]).join("").slice(0, 2).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-foreground truncate">{c.candidateName}</p>
                     <p className="text-xs text-muted-foreground">
-                      {c.provider} · Started {new Date(c.createdAt).toLocaleDateString()} · ETA {c.etaDays}d
+                      {c.provider} · Started {new Date(c.createdAt || new Date()).toLocaleDateString()} · ETA {c.etaDays}d
                     </p>
                   </div>
                   <Badge className={statusColor(c.status)}>{c.status}</Badge>
