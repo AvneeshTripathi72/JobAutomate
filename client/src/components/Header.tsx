@@ -234,114 +234,147 @@ export default function Header() {
         </div>
       </div>
 
-      {/* ── Sticky main header bar (sticks to the top) ── */}
-      <header className="sticky top-0 z-50 w-full bg-white border-b border-slate-200 shadow-sm">
+      {/* ── Sticky main header bar ── */}
+      <header className="sticky top-0 z-50 w-full bg-white border-b border-slate-100 shadow-[0_1px_16px_rgba(0,0,0,0.06)]">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center gap-4">
+          <div className="flex h-[68px] items-center gap-6">
 
-            {/* Integrated Logo (Desktop & Mobile) */}
-            <Link href="/" data-testid="link-home" className="flex items-center flex-shrink-0">
-              <TilconsLogo className="h-10 md:h-12 w-auto" />
+            {/* Logo */}
+            <Link href="/" data-testid="link-home" className="flex items-center flex-shrink-0 mr-2">
+              <TilconsLogo className="h-10 md:h-11 w-auto" />
             </Link>
 
-            {/* LEFT nav: Home · About · Contact · Salary Guide */}
-            <nav className="hidden md:flex items-center gap-1">
-                <Link href="/" data-testid="link-nav-home" className="text-sm font-bold uppercase tracking-wider text-slate-600 hover:text-sky-600 px-3 py-2 rounded-md transition-colors">Home</Link>
+            {/* Thin vertical divider */}
+            <div className="hidden md:block w-px h-7 bg-slate-200 shrink-0" />
 
-                {/* ABOUT mega-menu (Company + Product) */}
-                <div className="relative" {...makeHover(setNavCompanyOpen, navCompanyTimeoutRef)}>
-                  <button data-testid="button-nav-company" className={`flex items-center gap-1 text-sm font-bold uppercase tracking-wider px-3 py-2 rounded-md transition-colors ${navCompanyOpen ? "text-sky-600" : "text-slate-600 hover:text-sky-600"}`}>
-                    About
-                    <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${navCompanyOpen ? "rotate-180" : ""}`} />
-                  </button>
-                  {navCompanyOpen && (
-                    <div className="absolute top-full left-0 pt-1 animate-in fade-in slide-in-from-top-2 duration-200 z-50">
-                      <div className="w-[860px] max-w-[calc(100vw-2rem)] bg-card border border-border rounded-xl shadow-2xl overflow-hidden">
-                        <div className="p-6 grid grid-cols-4 gap-6">
+            {/* LEFT nav links */}
+            <nav className="hidden md:flex items-center gap-0.5 flex-1">
+              <Link
+                href="/"
+                data-testid="link-nav-home"
+                className="relative group px-4 py-2 text-[13px] font-semibold text-slate-600 hover:text-[#0d2137] transition-colors rounded-lg hover:bg-slate-50"
+              >
+                Home
+                <span className="absolute bottom-1.5 left-4 right-4 h-0.5 bg-sky-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-full" />
+              </Link>
 
-                        {/* Column 1: Image card with CTA */}
-                        <div className="flex flex-col">
-                          <div className="rounded-lg overflow-hidden mb-3 aspect-[4/3] bg-muted">
-                            <img src={aboutMenuImage} alt="Tilcons team" className="w-full h-full object-cover" />
-                          </div>
-                          <h4 className="text-base font-bold text-foreground mb-1.5">Start your career with us</h4>
-                          <p className="text-xs text-muted-foreground mb-3 leading-relaxed">Tilcons changes lives by connecting talent with opportunity across India.</p>
-                          <Link href="/jobs">
-                            <Button size="sm" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-md" data-testid="button-menu-apply-now">Apply now</Button>
-                          </Link>
+              {/* ABOUT mega-menu */}
+              <div className="relative" {...makeHover(setNavCompanyOpen, navCompanyTimeoutRef)}>
+                <button
+                  data-testid="button-nav-company"
+                  className={`relative group flex items-center gap-1.5 px-4 py-2 text-[13px] font-semibold rounded-lg transition-colors ${navCompanyOpen ? "text-sky-600 bg-sky-50" : "text-slate-600 hover:text-[#0d2137] hover:bg-slate-50"}`}
+                >
+                  About
+                  <ChevronDown className={`h-3.5 w-3.5 transition-transform duration-200 ${navCompanyOpen ? "rotate-180 text-sky-500" : "text-slate-400"}`} />
+                  {navCompanyOpen && <span className="absolute bottom-1.5 left-4 right-4 h-0.5 bg-sky-500 rounded-full" />}
+                </button>
+                {navCompanyOpen && (
+                  <div className="absolute top-[calc(100%+6px)] left-0 animate-in fade-in slide-in-from-top-2 duration-200 z-[200]">
+                    <div className="w-[860px] max-w-[calc(100vw-2rem)] bg-white border border-slate-200 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.12)] overflow-hidden">
+                      <div className="p-6 grid grid-cols-4 gap-6">
+
+                      {/* Column 1: Image card with CTA */}
+                      <div className="flex flex-col">
+                        <div className="rounded-xl overflow-hidden mb-3 aspect-[4/3] bg-slate-100">
+                          <img src={aboutMenuImage} alt="Tilcons team" className="w-full h-full object-cover" />
                         </div>
+                        <h4 className="text-base font-bold text-slate-900 mb-1.5">Start your career with us</h4>
+                        <p className="text-xs text-slate-500 mb-3 leading-relaxed">Tilcons changes lives by connecting talent with opportunity across India.</p>
+                        <Link href="/jobs">
+                          <Button size="sm" className="w-full bg-sky-600 hover:bg-sky-500 text-white rounded-lg" data-testid="button-menu-apply-now">Apply now</Button>
+                        </Link>
+                      </div>
 
-                        {/* Column 2: Primary sub-nav */}
-                        <div className="border-l border-border pl-6">
-                          <Link href="/about" className="flex items-center justify-between gap-2 py-2.5 text-sm font-semibold text-foreground hover:text-primary transition-colors group">
-                            <span>About Tilcons</span>
-                            <span className="text-primary opacity-0 group-hover:opacity-100 transition-opacity">→</span>
-                          </Link>
-                          <Link href="/locations" className="flex items-center justify-between gap-2 py-2.5 text-sm font-semibold text-foreground hover:text-primary transition-colors group">
-                            <span>Our Reach</span>
-                            <span className="text-primary opacity-0 group-hover:opacity-100 transition-opacity">→</span>
-                          </Link>
-                          <Link href="/vendor-registration" className="flex items-center justify-between gap-2 py-2.5 text-sm font-semibold text-foreground hover:text-primary transition-colors group">
-                            <span>Vendor Partners</span>
-                            <span className="text-primary opacity-0 group-hover:opacity-100 transition-opacity">→</span>
-                          </Link>
-                        </div>
+                      {/* Column 2: Primary sub-nav */}
+                      <div className="border-l border-slate-100 pl-6">
+                        <p className="pb-3 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">Company</p>
+                        <Link href="/about" className="flex items-center justify-between gap-2 py-2.5 text-sm font-semibold text-slate-700 hover:text-sky-600 transition-colors group">
+                          <span>About Tilcons</span>
+                          <span className="text-sky-500 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                        </Link>
+                        <Link href="/locations" className="flex items-center justify-between gap-2 py-2.5 text-sm font-semibold text-slate-700 hover:text-sky-600 transition-colors group">
+                          <span>Our Reach</span>
+                          <span className="text-sky-500 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                        </Link>
+                        <Link href="/vendor-registration" className="flex items-center justify-between gap-2 py-2.5 text-sm font-semibold text-slate-700 hover:text-sky-600 transition-colors group">
+                          <span>Vendor Partners</span>
+                          <span className="text-sky-500 opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                        </Link>
+                      </div>
 
-                        {/* Column 3: Our Success */}
-                        <div>
-                          <p className="pb-3 text-sm font-bold text-foreground">Our Success</p>
-                          <div className="flex flex-col gap-2.5">
-                            <Link href="/roadmap" className="text-sm text-muted-foreground hover:text-primary transition-colors">Roadmap</Link>
-                            <Link href="/salary-guide" className="text-sm text-muted-foreground hover:text-primary transition-colors">Salary Guide 2025</Link>
-                            <Link href="/career-advice" className="text-sm text-muted-foreground hover:text-primary transition-colors">Knowledge Hub</Link>
-                            <Link href="/industries" className="text-sm text-muted-foreground hover:text-primary transition-colors">Industries</Link>
-                          </div>
+                      {/* Column 3: Our Success */}
+                      <div>
+                        <p className="pb-3 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">Resources</p>
+                        <div className="flex flex-col gap-2.5">
+                          <Link href="/roadmap" className="text-sm text-slate-600 hover:text-sky-600 transition-colors">Roadmap</Link>
+                          <Link href="/salary-guide" className="text-sm text-slate-600 hover:text-sky-600 transition-colors">Salary Guide 2025</Link>
+                          <Link href="/career-advice" className="text-sm text-slate-600 hover:text-sky-600 transition-colors">Knowledge Hub</Link>
+                          <Link href="/industries" className="text-sm text-slate-600 hover:text-sky-600 transition-colors">Industries</Link>
                         </div>
+                      </div>
 
-                        {/* Column 4: Our Product */}
-                        <div>
-                          <p className="pb-3 text-sm font-bold text-foreground">Our Product</p>
-                          <div className="flex flex-col gap-2.5">
-                            <Link href="/ats" className="text-sm text-muted-foreground hover:text-primary transition-colors">ATS Platform</Link>
-                            <Link href="/crm" className="text-sm text-muted-foreground hover:text-primary transition-colors">CRM Workspace</Link>
-                            <Link href="/services" className="text-sm text-muted-foreground hover:text-primary transition-colors">Services</Link>
-                          </div>
+                      {/* Column 4: Our Product */}
+                      <div>
+                        <p className="pb-3 text-[10px] font-black uppercase tracking-[0.15em] text-slate-400">Platform</p>
+                        <div className="flex flex-col gap-2.5">
+                          <Link href="/ats" className="text-sm text-slate-600 hover:text-sky-600 transition-colors">ATS Platform</Link>
+                          <Link href="/crm" className="text-sm text-slate-600 hover:text-sky-600 transition-colors">CRM Workspace</Link>
+                          <Link href="/services" className="text-sm text-slate-600 hover:text-sky-600 transition-colors">Services</Link>
                         </div>
-
-                        </div>
-
-                        {/* Unified footer row: Coming Soon roadmap pill + Request Demo / Explore Product */}
-                        <div className="border-t border-border bg-muted/30 px-6 py-4 flex flex-wrap items-center justify-between gap-3">
-                          <Link href="/roadmap" data-testid="link-menu-coming-soon" className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-amber-700 dark:text-amber-300 hover:text-amber-600 transition-colors">
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/15 border border-amber-500/30">Coming Soon</span>
-                            Naukri · GST · AI matching → See full roadmap
-                          </Link>
-                          <div className="flex items-center gap-2">
-                            <Link href="/contact">
-                              <Button size="sm" variant="outline" data-testid="button-menu-request-demo">Request Demo</Button>
-                            </Link>
-                            <Link href="/ats">
-                              <Button size="sm" className="bg-sky-500 hover:bg-sky-400 text-white" data-testid="button-menu-explore-product">Explore Product</Button>
-                            </Link>
-                          </div>
-                        </div>
+                      </div>
 
                       </div>
+
+                      {/* Mega menu footer */}
+                      <div className="border-t border-slate-100 bg-slate-50/70 px-6 py-4 flex flex-wrap items-center justify-between gap-3">
+                        <Link href="/roadmap" data-testid="link-menu-coming-soon" className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.18em] text-amber-700 hover:text-amber-600 transition-colors">
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/15 border border-amber-500/30">Coming Soon</span>
+                          Naukri · GST · AI matching → See full roadmap
+                        </Link>
+                        <div className="flex items-center gap-2">
+                          <Link href="/contact">
+                            <Button size="sm" variant="outline" className="border-slate-200 text-slate-700 hover:bg-slate-100" data-testid="button-menu-request-demo">Request Demo</Button>
+                          </Link>
+                          <Link href="/ats">
+                            <Button size="sm" className="bg-sky-600 hover:bg-sky-500 text-white" data-testid="button-menu-explore-product">Explore Product</Button>
+                          </Link>
+                        </div>
+                      </div>
+
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
+              </div>
 
-                <Link href="/contact" data-testid="link-nav-contact" className="text-sm font-bold uppercase tracking-wider text-slate-600 hover:text-sky-600 px-3 py-2 rounded-md transition-colors">Contact</Link>
+              <Link
+                href="/contact"
+                data-testid="link-nav-contact"
+                className="relative group px-4 py-2 text-[13px] font-semibold text-slate-600 hover:text-[#0d2137] transition-colors rounded-lg hover:bg-slate-50"
+              >
+                Contact
+                <span className="absolute bottom-1.5 left-4 right-4 h-0.5 bg-sky-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left rounded-full" />
+              </Link>
 
-                <Link href="/salary-guide" data-testid="link-nav-salary-guide" className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-slate-700 border border-slate-200 bg-white hover:border-sky-600 hover:text-sky-600 px-3 py-1.5 rounded-md transition-colors ml-1">
-                  <IndianRupee className="h-3.5 w-3.5" />
-                  Salary Guide
-                </Link>
+              <Link
+                href="/salary-guide"
+                data-testid="link-nav-salary-guide"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-bold text-sky-700 bg-sky-50 border border-sky-200 hover:bg-sky-100 hover:border-sky-300 rounded-lg transition-all ml-1"
+              >
+                <IndianRupee className="h-3.5 w-3.5" />
+                Salary Guide
+              </Link>
+            </nav>
 
-              </nav>
-
-              {/* Right side: mobile hamburger only (employer actions moved into the "I'm an Employer" ribbon menu) */}
-              <div className="flex items-center gap-1 ml-auto">
+            {/* Right side: CTA + mobile menu */}
+            <div className="flex items-center gap-2 ml-auto">
+              {/* Desktop CTA */}
+              <Link href="/signin" className="hidden md:flex items-center gap-2 px-4 py-2 text-[13px] font-bold text-white bg-[#0d2137] hover:bg-[#1a3a5c] rounded-lg transition-colors shadow-sm">
+                <LogIn className="h-3.5 w-3.5" />
+                Sign In
+              </Link>
+              <Link href="/jobs" className="hidden md:flex items-center gap-2 px-4 py-2 text-[13px] font-bold text-white bg-sky-600 hover:bg-sky-500 rounded-lg transition-colors shadow-sm">
+                Find Jobs
+              </Link>
 
               {/* Mobile hamburger */}
               <button
@@ -382,11 +415,7 @@ export default function Header() {
                   <Link href="/jobseeker-auth" className="flex items-center gap-3 px-4 py-3 bg-primary text-primary-foreground rounded-xl font-bold shadow-md">
                     <User className="h-5 w-5" /> Candidate Portal
                   </Link>
-                  <Link
-                    href="/signin"
-                    data-testid="link-mobile-login-ats-crm"
-                    className="flex items-center gap-3 px-4 py-3 bg-[#0d2137] text-white rounded-xl font-bold shadow-md"
-                  >
+                  <Link href="/signin" data-testid="link-mobile-login-ats-crm" className="flex items-center gap-3 px-4 py-3 bg-[#0d2137] text-white rounded-xl font-bold shadow-md">
                     <LogIn className="h-5 w-5" /> ATS + CRM Login
                   </Link>
                 </div>
@@ -395,6 +424,7 @@ export default function Header() {
           )}
         </div>
       </header>
+
     </>
   );
 }
