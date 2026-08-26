@@ -402,6 +402,30 @@ export default function SignIn() {
                 </Button>
               </div>
 
+              {/* Super Admin Bypass Button */}
+              <div className="p-3 bg-violet-50 dark:bg-violet-950/40 border border-violet-200 dark:border-violet-800 rounded-lg space-y-2 text-center mb-3">
+                <div className="flex items-center justify-center gap-1.5 mb-1">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-violet-600 text-white">Super Admin</span>
+                </div>
+                <p className="text-xs font-bold text-violet-900 dark:text-violet-200">Super Admin Access Credentials:</p>
+                <div className="text-xs text-violet-800 dark:text-violet-300 font-mono bg-white dark:bg-slate-900 p-1.5 rounded border border-violet-200">
+                  User: <span className="font-bold">superadmin@tilcons.com</span> | Pass: <span className="font-bold">super@123</span>
+                </div>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="w-full bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs"
+                  onClick={() => {
+                    toast({ title: "🔐 Super Admin Access", description: "Navigating to Super Admin Panel..." });
+                    window.location.replace("/super-admin");
+                  }}
+                  data-testid="button-super-admin-bypass"
+                >
+                  🔐 Instant Super Admin Login (Bypass)
+                </Button>
+              </div>
+
               <div className="relative my-5">
                 <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
                 <span className="relative flex justify-center text-xs uppercase tracking-wider bg-white px-3 text-muted-foreground">or Sign in with</span>
