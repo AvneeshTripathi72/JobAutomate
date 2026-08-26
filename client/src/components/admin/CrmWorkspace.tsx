@@ -494,6 +494,31 @@ function EditDealDialog({ deal, clients, onClose }: { deal: Deal; clients: Clien
 /* ── Main CRM Workspace ────────────────────────────────────────────────────── */
 export default function CrmWorkspace() {
   const { toast } = useToast();
+  const [dbReady, setDbReady] = useState<boolean | null>(null);
+
+  // ── Auto-check & notify if tables aren't provisioned ────────────────────
+  const checkDbAndSetup = async () => {
+    try {
+      const { error } = await supabase.from("clients").select("id").limit(1);
+      if (error && error.code === "42P01") {
+        // Table doesn't exist
+        setDbReady(false);
+        toast({
+          title: "⚠️ Database Setup Required",
+          description: "The clients/deals tables don't exist yet. Please run the SQL migration in your Supabase Dashboard.",
+          variant: "destructive",
+        });
+      } else {
+        setDbReady(true);
+      }
+    } catch {
+      setDbReady(false);
+    }
+  };
+
+  // Run on mount
+  useState(() => { checkDbAndSetup(); });
+
   const { data: clients = [], isLoading: clientsLoading } = useQuery<Client[]>({
     queryKey: ["/api/crm/clients"],
     queryFn: async () => {
@@ -582,6 +607,60 @@ export default function CrmWorkspace() {
       )}
       {editingDeal && (
         <EditDealDialog deal={editingDeal} clients={clients} onClose={() => setEditingDeal(null)} />
+      )}
+
+      {/* DB setup banner — shown when tables don't exist yet */}
+      {dbReady === false && (
+        <div className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-900/10 px-4 py-4 flex items-start gap-3">
+          <span className="text-lg shrink-0">⚠️</span>
+          <div className="flex-1">
+            <p className="text-sm font-bold text-amber-900 dark:text-amber-200 mb-1">Database Tables Not Found</p>
+            <p className="text-xs text-amber-800/80 dark:text-amber-300/80 mb-3">
+              The <code className="font-mono bg-amber-100 dark:bg-amber-900 px-1 rounded">clients</code> and <code className="font-mono bg-amber-100 dark:bg-amber-900 px-1 rounded">deals</code> tables don't exist yet in your Supabase database.
+              Run the migration SQL to activate CRM:
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <a
+                href={`https://supabase.com/dashboard/project/yeoavqufxojhraycowtu/sql/new`}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition-colors"
+              >
+                Open Supabase SQL Editor →
+              </a>
+              <button
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white border border-amber-300 text-amber-800 text-xs font-bold hover:bg-amber-50 transition-colors"
+                onClick={() => {
+                  const sql = `-- Run this in Supabase Dashboard > SQL Editor
+CREATE TABLE IF NOT EXISTS public.clients (
+  id uuid primary key default gen_random_uuid(),
+  company_id uuid, company_name text not null, industry text not null,
+  city text not null, primary_contact_name text not null,
+  primary_contact_email text not null, primary_contact_phone text,
+  account_owner text default 'Unassigned', arr_inr integer default 0,
+  notes text, status text default 'active',
+  created_at timestamptz default now(), updated_at timestamptz default now()
+);
+CREATE TABLE IF NOT EXISTS public.deals (
+  id uuid primary key default gen_random_uuid(),
+  client_id uuid references public.clients on delete cascade not null,
+  title text not null, stage text default 'qualified',
+  value_inr integer default 0, positions integer default 1,
+  owner text default 'Unassigned', notes text,
+  created_at timestamptz default now(), updated_at timestamptz default now()
+);
+ALTER TABLE public.clients DISABLE ROW LEVEL SECURITY;
+ALTER TABLE public.deals DISABLE ROW LEVEL SECURITY;`;
+                  navigator.clipboard.writeText(sql).then(() =>
+                    toast({ title: "SQL copied!", description: "Paste it in Supabase SQL Editor and run." })
+                  );
+                }}
+              >
+                📋 Copy SQL to Clipboard
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       <div className="rounded-lg border border-emerald-200 dark:border-emerald-900/40 bg-emerald-50 dark:bg-emerald-900/10 px-4 py-3 flex items-start gap-3">
