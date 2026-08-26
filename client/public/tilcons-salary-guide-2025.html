@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tilcons 2025 Salary &amp; Hiring Guide</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', Arial, sans-serif;
+    background: #f5f5f3;
+    color: #1a1a2e;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .page {
+    max-width: 860px;
+    margin: 0 auto;
+    background: #fff;
+    box-shadow: 0 4px 40px rgba(0,0,0,0.08);
+  }
+
+  /* ── Cover ── */
+  .cover {
+    background: #0d2137;
+    padding: 60px 60px 50px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 320px; height: 320px;
+    border-radius: 50%;
+    background: rgba(242,101,34,0.12);
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -80px;
+    width: 260px; height: 260px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+  .cover-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 50px;
+  }
+  .cover-logo-box {
+    width: 36px; height: 36px;
+    background: #f26522;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .cover-logo-box span {
+    color: #fff;
+    font-weight: 900;
+    font-size: 18px;
+    letter-spacing: -1px;
+  }
+  .cover-logo-name {
+    color: #fff;
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: -0.5px;
+  }
+  .cover-tag {
+    color: #f26522;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-bottom: 16px;
+  }
+  .cover h1 {
+    color: #fff;
+    font-size: 40px;
+    font-weight: 900;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    margin-bottom: 12px;
+  }
+  .cover h1 span { color: #f26522; }
+  .cover-sub {
+    color: rgba(255,255,255,0.6);
+    font-size: 14px;
+    max-width: 480px;
+    margin-bottom: 40px;
+  }
+  .cover-meta {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .cover-meta-item {
+    border-left: 3px solid #f26522;
+    padding-left: 12px;
+  }
+  .cover-meta-item .val {
+    color: #fff;
+    font-weight: 900;
+    font-size: 20px;
+  }
+  .cover-meta-item .lbl {
+    color: rgba(255,255,255,0.5);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* ── Section ── */
+  .section {
+    padding: 44px 60px;
+    border-bottom: 1px solid #ebebeb;
+  }
+  .section:last-child { border-bottom: none; }
+  .section-tag {
+    color: #f26522;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    margin-bottom: 6px;
+  }
+  .section h2 {
+    font-size: 22px;
+    font-weight: 900;
+    color: #0d2137;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+  .section-intro {
+    color: #666;
+    font-size: 13px;
+    margin-bottom: 24px;
+    max-width: 580px;
+  }
+
+  /* ── Salary table ── */
+  .salary-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+  }
+  .salary-table thead tr {
+    background: #0d2137;
+    color: #fff;
+  }
+  .salary-table thead th {
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .salary-table tbody tr:nth-child(even) { background: #f9f8f6; }
+  .salary-table tbody tr:hover { background: #fff3ee; }
+  .salary-table tbody td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #ebebeb;
+    color: #1a1a2e;
+  }
+  .salary-table .role { font-weight: 600; }
+  .salary-table .salary { color: #0d2137; font-weight: 700; }
+  .salary-table .growth {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #16a34a;
+    font-weight: 700;
+    font-size: 11.5px;
+  }
+  .salary-table .growth.flat { color: #92400e; }
+  .salary-table .demand {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 10.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .demand-high { background: #dcfce7; color: #15803d; }
+  .demand-med  { background: #fef3c7; color: #92400e; }
+  .demand-low  { background: #fee2e2; color: #b91c1c; }
+
+  /* ── Key trends ── */
+  .trends-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 4px;
+  }
+  .trend-card {
+    background: #f9f8f6;
+    border-left: 4px solid #f26522;
+    border-radius: 0 8px 8px 0;
+    padding: 16px;
+  }
+  .trend-card h4 {
+    font-size: 13px;
+    font-weight: 800;
+    color: #0d2137;
+    margin-bottom: 6px;
+  }
+  .trend-card p { color: #555; font-size: 12px; }
+
+  /* ── Hiring tips ── */
+  .tips-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 4px;
+  }
+  .tips-list li {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .tip-num {
+    width: 24px; height: 24px;
+    background: #f26522;
+    color: #fff;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900;
+    font-size: 11px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .tips-list li p { font-size: 12.5px; color: #333; }
+  .tips-list li strong { color: #0d2137; }
+
+  /* ── Footer ── */
+  .footer {
+    background: #0d2137;
+    padding: 28px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .footer p { color: rgba(255,255,255,0.45); font-size: 11px; }
+  .footer .brand { color: #fff; font-weight: 900; font-size: 13px; }
+  .footer .brand span { color: #f26522; }
+
+  /* ── Print button (hidden in print) ── */
+  .print-bar {
+    background: #fff;
+    border-bottom: 1px solid #ebebeb;
+    padding: 12px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .print-bar p { font-size: 12px; color: #888; }
+  .print-btn {
+    background: #f26522;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 20px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+  .print-btn:hover { opacity: 0.9; }
+
+  @media print {
+    .print-bar { display: none !important; }
+    body { background: #fff; }
+    .page { box-shadow: none; max-width: 100%; }
+    .section { padding: 32px 48px; }
+    .cover { padding: 48px; }
+    .footer { padding: 20px 48px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- Print bar -->
+  <div class="print-bar">
+    <p>Tilcons 2025 Salary &amp; Hiring Guide — Save as PDF using your browser's print function</p>
+    <button class="print-btn" onclick="window.print()">Save as PDF</button>
+  </div>
+
+  <!-- Cover -->
+  <div class="cover">
+    <div class="cover-logo">
+      <div class="cover-logo-box"><span>T</span></div>
+      <span class="cover-logo-name">Tilcons</span>
+    </div>
+    <div class="cover-tag">Free Resource &bull; 2025 Edition</div>
+    <h1>Salary &amp; Hiring<br /><span>Guide 2025</span></h1>
+    <p class="cover-sub">Benchmark salaries, understand talent demand, and make smarter hiring and career decisions across 6 key sectors.</p>
+    <div class="cover-meta">
+      <div class="cover-meta-item">
+        <div class="val">6</div>
+        <div class="lbl">Industries covered</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="val">40+</div>
+        <div class="lbl">Roles benchmarked</div>
+      </div>
+      <div class="cover-meta-item">
+        <div class="val">250+</div>
+        <div class="lbl">Placements made</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Technology -->
+  <div class="section">
+    <div class="section-tag">Sector 01</div>
+    <h2>Technology &amp; IT</h2>
+    <p class="section-intro">Tech roles continue to command premium salaries. Demand for AI/ML engineers, cloud architects, and cybersecurity specialists has surged 35% year-on-year.</p>
+    <table class="salary-table">
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Experience</th>
+          <th>Annual Salary (INR)</th>
+          <th>YoY Growth</th>
+          <th>Demand</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="role">Software Engineer</td><td>2–5 yrs</td><td class="salary">₹8L – ₹18L</td><td><span class="growth">▲ 12%</span></td><td><span class="demand demand-high">Very High</span></td></tr>
+        <tr><td class="role">Senior Software Engineer</td><td>5–9 yrs</td><td class="salary">₹18L – ₹35L</td><td><span class="growth">▲ 15%</span></td><td><span class="demand demand-high">Very High</span></td></tr>
+        <tr><td class="role">Cloud / DevOps Engineer</td><td>3–7 yrs</td><td class="salary">₹12L – ₹28L</td><td><span class="growth">▲ 18%</span></td><td><span class="demand demand-high">Very High</span></td></tr>
+        <tr><td class="role">Data Scientist</td><td>2–6 yrs</td><td class="salary">₹10L – ₹25L</td><td><span class="growth">▲ 20%</span></td><td><span class="demand demand-high">Very High</span></td></tr>
+        <tr><td class="role">AI / ML Engineer</td><td>3–8 yrs</td><td class="salary">₹15L – ₹40L</td><td><span class="growth">▲ 28%</span></td><td><span class="demand demand-high">Very High</span></td></tr>
+        <tr><td class="role">Cybersecurity Analyst</td><td>2–5 yrs</td><td class="salary">₹8L – ₹20L</td><td><span class="growth">▲ 22%</span></td><td><span class="demand demand-high">Very High</span></td></tr>
+        <tr><td class="role">UI / UX Designer</td><td>2–5 yrs</td><td class="salary">₹6L – ₹16L</td><td><span class="growth">▲ 9%</span></td><td><span class="demand demand-med">High</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Manufacturing -->
+  <div class="section">
+    <div class="section-tag">Sector 02</div>
+    <h2>Manufacturing</h2>
+    <p class="section-intro">Automation specialists and lean manufacturing experts are the most sought-after profiles. Quality control and process engineering roles are seeing steady salary inflation.</p>
+    <table class="salary-table">
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Experience</th>
+          <th>Annual Salary (INR)</th>
+          <th>YoY Growth</th>
+          <th>Demand</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="role">Manufacturing Supervisor</td><td>4–8 yrs</td><td class="salary">₹6L – ₹12L</td><td><span class="growth">▲ 8%</span></td><td><span class="demand demand-high">High</span></td></tr>
+        <tr><td class="role">Process Engineer</td><td>3–7 yrs</td><td class="salary">₹8L – ₹16L</td><td><span class="growth">▲ 11%</span></td><td><span class="demand demand-high">High</span></td></tr>
+        <tr><td class="role">Quality Assurance Manager</td><td>5–10 yrs</td><td class="salary">₹10L – ₹20L</td><td><span class="growth">▲ 10%</span></td><td><span class="demand demand-med">Medium</span></td></tr>
+        <tr><td class="role">CNC Operator</td><td>2–5 yrs</td><td class="salary">₹3L – ₹7L</td><td><span class="growth flat">▲ 5%</span></td><td><span class="demand demand-med">Medium</span></td></tr>
+        <tr><td class="role">Automation / Robotics Engineer</td><td>3–7 yrs</td><td class="salary">₹10L – ₹22L</td><td><span class="growth">▲ 19%</span></td><td><span class="demand demand-high">Very High</span></td></tr>
+        <tr><td class="role">Plant Manager</td><td>10+ yrs</td><td class="salary">₹18L – ₹35L</td><td><span class="growth">▲ 7%</span></td><td><span class="demand demand-med">Medium</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Healthcare -->
+  <div class="section">
+    <div class="section-tag">Sector 03</div>
+    <h2>Healthcare</h2>
+    <p class="section-intro">Post-pandemic, healthcare staffing demand remains elevated. Specialised clinical roles and healthcare technology professionals command the highest premiums.</p>
+    <table class="salary-table">
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Experience</th>
+          <th>Annual Salary (INR)</th>
+          <th>YoY Growth</th>
+          <th>Demand</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="role">Registered Nurse (ICU/CCU)</td><td>2–6 yrs</td><td class="salary">₹4L – ₹9L</td><td><span class="growth">▲ 14%</span></td><td><span class="demand demand-high">Very High</span></td></tr>
+        <tr><td class="role">Medical Laboratory Technician</td><td>2–5 yrs</td><td class="salary">₹3L – ₹7L</td><td><span class="growth">▲ 9%</span></td><td><span class="demand demand-high">High</span></td></tr>
+        <tr><td class="role">Radiologist Technician</td><td>3–6 yrs</td><td class="salary">₹4L – ₹10L</td><td><span class="growth">▲ 12%</span></td><td><span class="demand demand-high">High</span></td></tr>
+        <tr><td class="role">Physiotherapist</td><td>2–5 yrs</td><td class="salary">₹3.5L – ₹8L</td><td><span class="growth">▲ 10%</span></td><td><span class="demand demand-med">Medium</span></td></tr>
+        <tr><td class="role">Healthcare Administrator</td><td>3–7 yrs</td><td class="salary">₹5L – ₹12L</td><td><span class="growth">▲ 8%</span></td><td><span class="demand demand-med">Medium</span></td></tr>
+        <tr><td class="role">Clinical Research Associate</td><td>2–5 yrs</td><td class="salary">₹5L – ₹14L</td><td><span class="growth">▲ 16%</span></td><td><span class="demand demand-high">High</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Finance -->
+  <div class="section">
+    <div class="section-tag">Sector 04</div>
+    <h2>Finance &amp; Accounting</h2>
+    <p class="section-intro">Demand for qualified CAs and CFAs remains robust. FinTech growth is driving premium salaries for finance professionals with technology skills.</p>
+    <table class="salary-table">
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Experience</th>
+          <th>Annual Salary (INR)</th>
+          <th>YoY Growth</th>
+          <th>Demand</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="role">Chartered Accountant (CA)</td><td>2–5 yrs</td><td class="salary">₹8L – ₹18L</td><td><span class="growth">▲ 10%</span></td><td><span class="demand demand-high">High</span></td></tr>
+        <tr><td class="role">Financial Analyst</td><td>2–5 yrs</td><td class="salary">₹6L – ₹15L</td><td><span class="growth">▲ 12%</span></td><td><span class="demand demand-high">High</span></td></tr>
+        <tr><td class="role">CFO</td><td>15+ yrs</td><td class="salary">₹40L – ₹1Cr+</td><td><span class="growth">▲ 8%</span></td><td><span class="demand demand-med">Medium</span></td></tr>
+        <tr><td class="role">Tax Manager</td><td>6–10 yrs</td><td class="salary">₹12L – ₹24L</td><td><span class="growth">▲ 9%</span></td><td><span class="demand demand-med">Medium</span></td></tr>
+        <tr><td class="role">Risk &amp; Compliance Manager</td><td>5–9 yrs</td><td class="salary">₹12L – ₹25L</td><td><span class="growth">▲ 15%</span></td><td><span class="demand demand-high">High</span></td></tr>
+        <tr><td class="role">Bookkeeper</td><td>2–4 yrs</td><td class="salary">₹3L – ₹6L</td><td><span class="growth flat">▲ 5%</span></td><td><span class="demand demand-med">Medium</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Logistics -->
+  <div class="section">
+    <div class="section-tag">Sector 05</div>
+    <h2>Logistics &amp; Supply Chain</h2>
+    <p class="section-intro">E-commerce growth has sustained high demand for logistics professionals. Supply chain analysts with data skills are particularly sought after in 2025.</p>
+    <table class="salary-table">
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Experience</th>
+          <th>Annual Salary (INR)</th>
+          <th>YoY Growth</th>
+          <th>Demand</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="role">Warehouse Manager</td><td>5–10 yrs</td><td class="salary">₹6L – ₹14L</td><td><span class="growth">▲ 9%</span></td><td><span class="demand demand-high">High</span></td></tr>
+        <tr><td class="role">Supply Chain Analyst</td><td>2–6 yrs</td><td class="salary">₹6L – ₹15L</td><td><span class="growth">▲ 13%</span></td><td><span class="demand demand-high">High</span></td></tr>
+        <tr><td class="role">Logistics Coordinator</td><td>2–5 yrs</td><td class="salary">₹4L – ₹9L</td><td><span class="growth">▲ 8%</span></td><td><span class="demand demand-med">Medium</span></td></tr>
+        <tr><td class="role">Procurement Manager</td><td>6–10 yrs</td><td class="salary">₹10L – ₹22L</td><td><span class="growth">▲ 11%</span></td><td><span class="demand demand-high">High</span></td></tr>
+        <tr><td class="role">Distribution Manager</td><td>7–12 yrs</td><td class="salary">₹12L – ₹24L</td><td><span class="growth">▲ 10%</span></td><td><span class="demand demand-med">Medium</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Administrative -->
+  <div class="section">
+    <div class="section-tag">Sector 06</div>
+    <h2>Administrative &amp; Office</h2>
+    <p class="section-intro">Executive assistant and office management roles are evolving to include digital skills. Hybrid-ready candidates with tech proficiency command above-market salaries.</p>
+    <table class="salary-table">
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Experience</th>
+          <th>Annual Salary (INR)</th>
+          <th>YoY Growth</th>
+          <th>Demand</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="role">Executive Assistant</td><td>3–7 yrs</td><td class="salary">₹5L – ₹12L</td><td><span class="growth">▲ 8%</span></td><td><span class="demand demand-high">High</span></td></tr>
+        <tr><td class="role">Office Manager</td><td>4–8 yrs</td><td class="salary">₹6L – ₹14L</td><td><span class="growth">▲ 7%</span></td><td><span class="demand demand-med">Medium</span></td></tr>
+        <tr><td class="role">HR Manager</td><td>5–10 yrs</td><td class="salary">₹8L – ₹18L</td><td><span class="growth">▲ 11%</span></td><td><span class="demand demand-high">High</span></td></tr>
+        <tr><td class="role">Receptionist</td><td>1–3 yrs</td><td class="salary">₹2.5L – ₹5L</td><td><span class="growth flat">▲ 5%</span></td><td><span class="demand demand-med">Medium</span></td></tr>
+        <tr><td class="role">Project Coordinator</td><td>2–5 yrs</td><td class="salary">₹5L – ₹11L</td><td><span class="growth">▲ 9%</span></td><td><span class="demand demand-high">High</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Key hiring trends -->
+  <div class="section">
+    <div class="section-tag">Insights</div>
+    <h2>Key Hiring Trends 2025</h2>
+    <p class="section-intro">What every employer and job seeker needs to know heading into the year ahead.</p>
+    <div class="trends-grid">
+      <div class="trend-card">
+        <h4>AI is reshaping job requirements</h4>
+        <p>Across every sector, familiarity with AI tools is becoming a baseline expectation. Candidates who demonstrate AI proficiency command 15–25% salary premiums.</p>
+      </div>
+      <div class="trend-card">
+        <h4>Skills-based hiring is accelerating</h4>
+        <p>More employers are dropping degree requirements in favour of demonstrated skills, portfolios, and certifications — widening the talent pool significantly.</p>
+      </div>
+      <div class="trend-card">
+        <h4>Speed wins the best talent</h4>
+        <p>Top candidates are typically off the market within 10 days. Companies with streamlined hiring processes have a decisive edge in securing high-quality hires.</p>
+      </div>
+      <div class="trend-card">
+        <h4>Hybrid work is now standard</h4>
+        <p>72% of professionals rank hybrid working as a top-3 consideration when evaluating a new role. Rigid in-office mandates cost employers top talent.</p>
+      </div>
+      <div class="trend-card">
+        <h4>Salary expectations have risen</h4>
+        <p>Candidates in all sectors are benchmarking against current market data and expecting 10–20% increases when switching roles. Underbidding leads to dropouts.</p>
+      </div>
+      <div class="trend-card">
+        <h4>DEI is a competitive differentiator</h4>
+        <p>Organisations with visible DEI commitments attract 40% more applications and see higher offer acceptance rates, particularly among Gen Z candidates.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hiring tips -->
+  <div class="section">
+    <div class="section-tag">Best Practices</div>
+    <h2>7 Tips to Hire Better in 2025</h2>
+    <p class="section-intro">Actionable advice from Tilcons consultants based on 250+ successful placements.</p>
+    <ul class="tips-list">
+      <li>
+        <div class="tip-num">1</div>
+        <p><strong>Define the role precisely before posting.</strong> Vague job descriptions attract the wrong candidates and waste everyone's time. List must-have vs. nice-to-have skills clearly.</p>
+      </li>
+      <li>
+        <div class="tip-num">2</div>
+        <p><strong>Move fast at every stage.</strong> Delay a day and you risk losing your best candidate. Aim to give feedback within 24 hours after each interview round.</p>
+      </li>
+      <li>
+        <div class="tip-num">3</div>
+        <p><strong>Benchmark your offer before making it.</strong> Use this guide to ensure your compensation is at or above market — especially for high-demand roles.</p>
+      </li>
+      <li>
+        <div class="tip-num">4</div>
+        <p><strong>Sell the role and the company.</strong> The best candidates have options. Articulate your culture, growth opportunities, and benefits clearly and compellingly.</p>
+      </li>
+      <li>
+        <div class="tip-num">5</div>
+        <p><strong>Consider total compensation.</strong> Salary is just one element. Flexible working, learning budgets, ESOPs, and healthcare benefits are major decision factors.</p>
+      </li>
+      <li>
+        <div class="tip-num">6</div>
+        <p><strong>Involve a specialist recruiter early.</strong> Access to a pre-screened talent pool cuts your time-to-hire by up to 60% and significantly improves quality of hire.</p>
+      </li>
+      <li>
+        <div class="tip-num">7</div>
+        <p><strong>Structure your onboarding.</strong> The first 90 days are critical. A structured onboarding programme increases retention by up to 82% in the first year.</p>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <div>
+      <div class="brand">Tilcons <span>Staffing</span></div>
+      <p style="margin-top:4px;">info@tilcons.com &bull; www.tilcons.com</p>
+    </div>
+    <p>&copy; 2025 Tilcons. All salary data is indicative and based on market benchmarks.<br />Actual salaries may vary by location, company size, and candidate profile.</p>
+  </div>
+
+</div>
+
+</body>
+</html>
