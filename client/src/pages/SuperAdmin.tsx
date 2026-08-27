@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
@@ -18,10 +18,10 @@ import {
 import {
   Building2, Users, Plus, LogOut, Globe, Trash2,
   CheckCircle2, XCircle, Pencil, LayoutGrid, BookOpen,
-  Briefcase, ShieldCheck, TrendingUp, Eye,
+  Briefcase, ShieldCheck, TrendingUp, Eye, Mail, UserCheck, UserX,
 } from "lucide-react";
 import logoPath from "@assets/Top_Logo_Tilcons_SkyBlue.png";
-import type { Company } from "@shared/schema";
+import type { Company, Contact } from "@shared/schema";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 type CompanyUser = {
@@ -179,6 +179,58 @@ function CompanyUsersDialog({ company, onClose }: { company: Company; onClose: (
   );
 }
 
+// ─── Resolve Onboarding Request Dialog ────────────────────────────────────────
+function ResolveDialog({ request, onClose, onResolve }: { request: Contact; onClose: () => void; onResolve: (plan: string) => void }) {
+  const [plan, setPlan] = useState("starter");
+  
+  // Parse company name from structured message
+  let companyName = request.name + "'s Team";
+  if (request.message) {
+    const companyMatch = request.message.match(/Company:\s*(.*)/i);
+    if (companyMatch && companyMatch[1]) {
+      companyName = companyMatch[1].trim();
+    }
+  }
+
+  return (
+    <Dialog open onOpenChange={o => !o && onClose()}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="text-base font-bold flex items-center gap-2">
+            <Building2 className="h-5 w-5 text-sky-500" /> Onboard {companyName}
+          </DialogTitle>
+          <DialogDescription className="text-xs text-muted-foreground mt-1">
+            Approve onboarding for {request.name}. A company workspace will be created, and the credentials will be emailed to <strong>{request.email}</strong>.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-4 py-4">
+          <div className="space-y-1.5">
+            <Label className="text-xs font-semibold">Select Subscription Plan</Label>
+            <Select value={plan} onValueChange={setPlan}>
+              <SelectTrigger className="w-full">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="starter">Starter Plan (INR pricing)</SelectItem>
+                <SelectItem value="pro">Pro Plan (INR pricing)</SelectItem>
+                <SelectItem value="enterprise">Enterprise Plan</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <DialogFooter className="gap-2">
+          <Button variant="outline" onClick={onClose} className="text-xs">Cancel</Button>
+          <Button onClick={() => onResolve(plan)} className="bg-sky-500 hover:bg-sky-400 text-white text-xs">
+            Approve & Create Workspace
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 // ─── Main SuperAdmin Page ─────────────────────────────────────────────────────
 const TABS = [
   { id: "companies", label: "Companies", icon: Building2 },
@@ -193,9 +245,14 @@ export default function SuperAdmin() {
   const [activeTab, setActiveTab] = useState<Tab>("companies");
   const [showOnboard, setShowOnboard] = useState(false);
   const [viewUsers, setViewUsers] = useState<Company | null>(null);
+  const [resolveRequestItem, setResolveRequestItem] = useState<Contact | null>(null);
 
   const { data: companies = [], isLoading } = useQuery<Company[]>({
     queryKey: ["/api/superadmin/companies"],
+  });
+
+  const { data: pendingRequests = [] } = useQuery<Contact[]>({
+    queryKey: ["/api/superadmin/pending-requests"],
   });
 
   const toggleActive = useMutation({
@@ -210,6 +267,24 @@ export default function SuperAdmin() {
       queryClient.invalidateQueries({ queryKey: ["/api/superadmin/companies"] });
       toast({ title: "Company deleted" });
     },
+  });
+
+  const resolveRequest = useMutation({
+    mutationFn: async ({ requestId, action, plan }: { requestId: string; action: "accept" | "reject"; plan?: string }) => {
+      const res = await apiRequest("POST", "/api/superadmin/resolve-request", { requestId, action, plan });
+      return res.json();
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/superadmin/companies"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/superadmin/pending-requests"] });
+      toast({
+        title: variables.action === "accept" ? "Company Onboarded! 🎉" : "Request Rejected",
+        description: variables.action === "accept" ? "Workspace created & credentials emailed." : "Rejection email sent.",
+      });
+    },
+    onError: (err: any) => {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    }
   });
 
   const totalActive = companies.filter(c => c.isActive).length;
@@ -302,6 +377,73 @@ export default function SuperAdmin() {
                 ))}
               </div>
 
+              {/* Pending Requests notifications */}
+              {pendingRequests.length > 0 && (
+                <Card className="border-0 shadow-sm border-l-4 border-amber-500 bg-amber-500/5">
+                  <CardHeader className="pb-2 flex flex-row items-center justify-between">
+                    <div>
+                      <CardTitle className="text-sm font-bold text-amber-800 dark:text-amber-400 uppercase tracking-wide flex items-center gap-2">
+                        <Mail className="h-4 w-4 animate-bounce" /> Pending Onboarding Requests
+                      </CardTitle>
+                      <p className="text-xs text-amber-700/80 mt-0.5">Approve or reject agency signup submissions.</p>
+                    </div>
+                    <Badge className="bg-amber-500 hover:bg-amber-600 text-white font-bold">{pendingRequests.length} Pending</Badge>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <div className="divide-y divide-amber-100 dark:divide-amber-950/30">
+                      {pendingRequests.map(request => {
+                        let companyName = request.name + "'s Team";
+                        if (request.message) {
+                          const companyMatch = request.message.match(/Company:\s*(.*)/i);
+                          if (companyMatch && companyMatch[1]) {
+                            companyName = companyMatch[1].trim();
+                          }
+                        }
+                        return (
+                          <div key={request.id} className="px-5 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-bold text-slate-800 dark:text-slate-200">{companyName}</span>
+                                <Badge variant="outline" className="text-[9px] uppercase border-amber-300 text-amber-700 bg-amber-50/50">Demo Request</Badge>
+                              </div>
+                              <p className="text-xs text-muted-foreground mt-0.5">
+                                Requested by: <strong>{request.name}</strong> ({request.email}) {request.phone ? `· ${request.phone}` : ""}
+                              </p>
+                              {request.message && (
+                                <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 bg-white/70 dark:bg-black/30 p-2.5 rounded-lg border border-slate-100 dark:border-slate-800/50 italic whitespace-pre-line leading-relaxed max-w-3xl">
+                                  {request.message}
+                                </p>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              <Button
+                                size="sm"
+                                onClick={() => setResolveRequestItem(request)}
+                                className="bg-emerald-600 hover:bg-emerald-500 text-white text-xs gap-1.5"
+                              >
+                                <UserCheck className="h-3.5 w-3.5" /> Onboard (Accept)
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  if (confirm(`Are you sure you want to reject the onboarding request from ${request.name}?`)) {
+                                    resolveRequest.mutate({ requestId: request.id || "", action: "reject" });
+                                  }
+                                }}
+                                className="border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 text-xs gap-1.5"
+                              >
+                                <UserX className="h-3.5 w-3.5" /> Reject
+                              </Button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Companies table */}
               <Card className="border-0 shadow-sm">
                 <CardHeader className="pb-3">
@@ -392,6 +534,20 @@ export default function SuperAdmin() {
       {/* Modals */}
       {showOnboard && <OnboardDialog onClose={() => setShowOnboard(false)} />}
       {viewUsers && <CompanyUsersDialog company={viewUsers} onClose={() => setViewUsers(null)} />}
+      {resolveRequestItem && (
+        <ResolveDialog
+          request={resolveRequestItem}
+          onClose={() => setResolveRequestItem(null)}
+          onResolve={(plan) => {
+            resolveRequest.mutate({
+              requestId: resolveRequestItem.id || "",
+              action: "accept",
+              plan
+            });
+            setResolveRequestItem(null);
+          }}
+        />
+      )}
     </div>
   );
 }

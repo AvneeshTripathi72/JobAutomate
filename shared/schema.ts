@@ -111,8 +111,9 @@ export const contactsSchema = z.object({
   phone: z.string().optional(),
   inquiryType: z.string(),
   message: z.string().min(1, 'Message is required'),
+  status: z.string().optional().default('pending'),
 });
-export const insertContactSchema = contactsSchema.omit({ id: true });
+export const insertContactSchema = contactsSchema.omit({ id: true, status: true });
 export type Contact = z.infer<typeof contactsSchema>;
 export type InsertContact = z.infer<typeof insertContactSchema>;
 

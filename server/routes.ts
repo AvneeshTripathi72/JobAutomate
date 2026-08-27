@@ -158,6 +158,235 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // ─── Local Onboarding & SuperAdmin Routes ──────────────────────────────────
+  app.post("/api/contacts", async (req, res) => {
+    const { name, email, phone, inquiryType, message } = req.body;
+    try {
+      const { data, error } = await supabase
+        .from("contacts")
+        .insert([{
+          name,
+          email,
+          phone: phone || null,
+          inquiry_type: inquiryType || "Demo Request",
+          message,
+          status: "pending"
+        }])
+        .select();
+      if (error) throw error;
+      
+      try {
+        const nodemailer = require("nodemailer");
+        const host = process.env.SMTP_HOST;
+        const user = process.env.SMTP_USER;
+        const pass = process.env.SMTP_PASS;
+        if (host && user && pass) {
+          const transporter = nodemailer.createTransport({
+            host,
+            port: parseInt(process.env.SMTP_PORT || "587", 10),
+            secure: process.env.SMTP_SECURE === "true",
+            auth: { user, pass },
+            tls: { rejectUnauthorized: false }
+          });
+          await transporter.sendMail({
+            from: process.env.SMTP_FROM || user,
+            to: "ashu@tilcons.com, deep@tilcons.com",
+            subject: `New ${inquiryType || "Enquiry"} – ${name}`,
+            html: `<p><strong>Name:</strong> ${name}</p><p><strong>Email:</strong> ${email}</p><p><strong>Message:</strong><br/>${message}</p>`
+          });
+        }
+      } catch (emailErr) {
+        console.warn("Local email alert skipped:", emailErr);
+      }
+
+      return res.json(data[0]);
+    } catch (err: any) {
+      return res.status(500).json({ message: err.message || "Failed to submit request" });
+    }
+  });
+
+  app.get("/api/superadmin/companies", async (req, res) => {
+    try {
+      const { data, error } = await supabase
+        .from("companies")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return res.json(data || []);
+    } catch (err: any) {
+      return res.status(500).json({ message: err.message || "Failed to fetch companies" });
+    }
+  });
+
+  app.get("/api/superadmin/companies/:companyId/users", async (req, res) => {
+    const { companyId } = req.params;
+    try {
+      const serviceKey = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+      if (!serviceKey) return res.json([]);
+      
+      const adminClient = createClient(supabaseUrl, serviceKey);
+      const { data: { users }, error: listError } = await adminClient.auth.admin.listUsers();
+      if (listError) throw listError;
+
+      const companyUsers = users
+        .filter(user => user.user_metadata && user.user_metadata.companyId === companyId)
+        .map(user => ({
+          id: user.id,
+          username: user.email?.split("@")[0] || "user",
+          email: user.email,
+          fullName: user.user_metadata.fullName || user.email?.split("@")[0],
+          role: user.user_metadata.role || "recruiter",
+          isActive: !user.banned_until,
+          createdAt: user.created_at
+        }));
+
+      return res.json(companyUsers);
+    } catch (err: any) {
+      return res.status(500).json({ message: err.message || "Failed to fetch users" });
+    }
+  });
+
+  app.patch("/api/superadmin/companies/:id", async (req, res) => {
+    const { id } = req.params;
+    const { isActive } = req.body;
+    try {
+      const { data, error } = await supabase
+        .from("companies")
+        .update({ isActive })
+        .eq("id", id)
+        .select();
+      if (error) throw error;
+      return res.json(data[0]);
+    } catch (err: any) {
+      return res.status(500).json({ message: err.message || "Failed to update company" });
+    }
+  });
+
+  app.delete("/api/superadmin/companies/:id", async (req, res) => {
+    const { id } = req.params;
+    try {
+      const serviceKey = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+      if (serviceKey) {
+        const adminClient = createClient(supabaseUrl, serviceKey);
+        const { data: { users } } = await adminClient.auth.admin.listUsers();
+        if (users) {
+          const toDelete = users.filter(user => user.user_metadata && user.user_metadata.companyId === id);
+          for (const u of toDelete) {
+            await adminClient.auth.admin.deleteUser(u.id);
+          }
+        }
+      }
+      const { error } = await supabase.from("companies").delete().eq("id", id);
+      if (error) throw error;
+      return res.json({ success: true });
+    } catch (err: any) {
+      return res.status(500).json({ message: err.message || "Failed to delete company" });
+    }
+  });
+
+  app.post("/api/superadmin/companies", async (req, res) => {
+    const { companyName, domain, plan, adminUsername, adminPassword, adminEmail, adminFullName } = req.body;
+    try {
+      const { data: companyData, error: companyError } = await supabase
+        .from("companies")
+        .insert([{ name: companyName, domain: domain || null, plan: plan || "starter", isActive: true }])
+        .select();
+      if (companyError) throw companyError;
+      const company = companyData[0];
+
+      const serviceKey = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+      if (serviceKey) {
+        const adminClient = createClient(supabaseUrl, serviceKey);
+        const { data: userData, error: userError } = await adminClient.auth.admin.createUser({
+          email: adminEmail,
+          password: adminPassword,
+          email_confirm: true,
+          user_metadata: {
+            fullName: adminFullName,
+            role: "company_admin",
+            companyId: company.id
+          }
+        });
+        if (userError) {
+          await supabase.from("companies").delete().eq("id", company.id);
+          throw userError;
+        }
+        return res.json({ company, user: userData.user });
+      }
+      return res.json({ company });
+    } catch (err: any) {
+      return res.status(500).json({ message: err.message || "Failed to onboard company" });
+    }
+  });
+
+  app.get("/api/superadmin/pending-requests", async (req, res) => {
+    try {
+      const { data, error } = await supabase
+        .from("contacts")
+        .select("*")
+        .eq("inquiry_type", "Demo Request")
+        .eq("status", "pending");
+      if (error) throw error;
+      return res.json(data || []);
+    } catch (err: any) {
+      return res.status(500).json({ message: err.message || "Failed to fetch pending requests" });
+    }
+  });
+
+  app.post("/api/superadmin/resolve-request", async (req, res) => {
+    const { requestId, action, plan } = req.body;
+    try {
+      const { data: requestData, error: fetchError } = await supabase
+        .from("contacts")
+        .select("*")
+        .eq("id", requestId)
+        .single();
+      if (fetchError || !requestData) return res.status(404).json({ message: "Request not found" });
+
+      const { name, email, message } = requestData;
+
+      if (action === "accept") {
+        let companyName = name + "'s Team";
+        if (message) {
+          const companyMatch = message.match(/Company:\s*(.*)/i);
+          if (companyMatch && companyMatch[1]) companyName = companyMatch[1].trim();
+        }
+
+        const { data: companyData, error: companyError } = await supabase
+          .from("companies")
+          .insert([{ name: companyName, plan: plan || "starter", isActive: true }])
+          .select();
+        if (companyError) throw companyError;
+        const company = companyData[0];
+
+        const tempPassword = "Tilcons@" + Math.random().toString(36).substring(2, 8) + "!";
+        const serviceKey = process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+        
+        if (serviceKey) {
+          const adminClient = createClient(supabaseUrl, serviceKey);
+          const { error: userError } = await adminClient.auth.admin.createUser({
+            email,
+            password: tempPassword,
+            email_confirm: true,
+            user_metadata: { fullName: name, role: "company_admin", companyId: company.id }
+          });
+          if (userError) {
+            await supabase.from("companies").delete().eq("id", company.id);
+            throw userError;
+          }
+        }
+
+        await supabase.from("contacts").update({ status: "accepted" }).eq("id", requestId);
+        return res.json({ success: true, company });
+      } else {
+        await supabase.from("contacts").update({ status: "rejected" }).eq("id", requestId);
+        return res.json({ success: true });
+      }
+    } catch (err: any) {
+      return res.status(500).json({ message: err.message || "Failed to resolve request" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
