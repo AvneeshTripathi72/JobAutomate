@@ -391,7 +391,7 @@ export default function AgastyaChat() {
           transform: isOpen ? "rotate(180deg) scale(0.9)" : "rotate(0deg) scale(1)",
         }}
       >
-        {isOpen ? <ChevronDown className="w-6 h-6" /> : <BrainCircuit className="w-6 h-6 text-white animate-pulse" />}
+        {isOpen ? <ChevronDown className="w-6 h-6" /> : <Bot className="w-6 h-6 text-white animate-pulse" />}
       </span>
 
       {/* Notification dot */}
