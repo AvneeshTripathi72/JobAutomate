@@ -1,17 +1,21 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
+const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID || "c6482e7f02a98ecdc8a0f7d2a9d14f6e";
+const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID || "f8936454ca4abdd1d726f93a611e83b6";
+const R2_SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY || "32f9ac9e5b6a1132e7bdd9cce43c8af68d0ff9410d43d94903b6305fb2d1da26";
+
 const r2 = new S3Client({
   region: "auto",
-  endpoint: `https://${process.env.CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  endpoint: `https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
   credentials: {
-    accessKeyId: process.env.R2_ACCESS_KEY_ID || "",
-    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY || "",
+    accessKeyId: R2_ACCESS_KEY_ID,
+    secretAccessKey: R2_SECRET_ACCESS_KEY,
   },
 });
 
 const BUCKET = process.env.R2_BUCKET_NAME || "first";
-const PUBLIC_URL = process.env.NEXT_PUBLIC_R2_PUBLIC_URL || "";
+const PUBLIC_URL = process.env.NEXT_PUBLIC_R2_PUBLIC_URL || "https://pub-0035a50eaf1046efa85b6e5d1631f721.r2.dev";
 
 // Vercel serverless function for resume upload to Cloudflare R2
 export default async function handler(req: VercelRequest, res: VercelResponse) {
