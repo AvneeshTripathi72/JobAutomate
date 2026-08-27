@@ -2573,7 +2573,18 @@ export default function Admin() {
                               <Button 
                                 size="sm" variant="ghost" 
                                 className="h-8 text-xs font-semibold hover:bg-white hover:text-slate-900 hover:shadow-sm shrink-0"
-                                onClick={() => seeker.resumeUrl && (seeker.resumeUrl.startsWith("http://") || seeker.resumeUrl.startsWith("https://")) ? window.open(seeker.resumeUrl, "_blank") : toast({ title: "No resume file uploaded yet" })}
+                                onClick={() => {
+                                  const actualUrl = seeker.resumeUrl
+                                    ? (seeker.resumeUrl.startsWith("http://") || seeker.resumeUrl.startsWith("https://")
+                                      ? seeker.resumeUrl
+                                      : `https://pub-0035a50eaf1046efa85b6e5d1631f721.r2.dev/${seeker.resumeUrl.replace(/^\//, "")}`)
+                                    : null;
+                                  if (actualUrl) {
+                                    window.open(actualUrl, "_blank");
+                                  } else {
+                                    toast({ title: "No resume file uploaded yet" });
+                                  }
+                                }}
                                 data-testid={`button-download-seeker-${seeker.id || ""}`}
                               >
                                 <Download className="h-3.5 w-3.5 mr-1 text-slate-500" /> Download

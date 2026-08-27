@@ -1,23 +1,19 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { createClient } from "@supabase/supabase-js";
 
-const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID || "c6482e7f02a98ecdc8a0f7d2a9d14f6e";
-const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID || "f8936454ca4abdd1d726f93a611e83b6";
-const R2_SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY || "32f9ac9e5b6a1132e7bdd9cce43c8af68d0ff9410d43d94903b6305fb2d1da26";
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://yeoavqufxojhraycowtu.supabase.co";
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "l7Mhv0iVctVmF4wcukTv1UgRouxnF39MK8dvRz_BalU"; // We extract just the signature part or use the one from env
 
-const r2 = new S3Client({
-  region: "auto",
-  endpoint: `https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
-  credentials: {
-    accessKeyId: R2_ACCESS_KEY_ID,
-    secretAccessKey: R2_SECRET_ACCESS_KEY,
-  },
-});
+const getSupabaseClient = () => {
+  // Use service role key to ensure we can check and create buckets programmatically
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || 
+    process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || 
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inllb2F2cXVmeG9qaHJheWNvd3R1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MzUwNTMxOCwiZXhwIjoyMDk5MDgxMzE4fQ.l7Mhv0iVctVmF4wcukTv1UgRouxnF39MK8dvRz_BalU";
+  
+  return createClient(supabaseUrl, key);
+};
 
-const BUCKET = process.env.R2_BUCKET_NAME || "first";
-const PUBLIC_URL = process.env.NEXT_PUBLIC_R2_PUBLIC_URL || "https://pub-0035a50eaf1046efa85b6e5d1631f721.r2.dev";
-
-// Vercel serverless function for resume upload to Cloudflare R2
+// Vercel serverless function for resume upload to Supabase Storage
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS headers
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -33,8 +29,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // Vercel parses multipart forms automatically when we set the config below
-    // We need to handle the raw body manually using busboy
     const { default: Busboy } = await import("busboy");
 
     return new Promise<void>((resolve) => {
@@ -79,25 +73,46 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
 
         try {
+          const supabase = getSupabaseClient();
+          
+          // 1. Ensure the "resumes" bucket exists and is public
+          const { data: buckets, error: listError } = await supabase.storage.listBuckets();
+          if (listError) throw listError;
+          
+          const hasBucket = buckets?.some((b) => b.name === "resumes");
+          if (!hasBucket) {
+            const { error: createError } = await supabase.storage.createBucket("resumes", {
+              public: true,
+              fileSizeLimit: 5242880 // 5 MB
+            });
+            if (createError) throw createError;
+          }
+
+          // 2. Upload file to Supabase Storage
           const timestamp = Date.now();
           const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
-          const key = `resumes/${timestamp}_${safeName}`;
+          const key = `${timestamp}_${safeName}`;
 
-          await r2.send(
-            new PutObjectCommand({
-              Bucket: BUCKET,
-              Key: key,
-              Body: fileBuffer,
-              ContentType: fileMimeType,
-            })
-          );
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from("resumes")
+            .upload(key, fileBuffer, {
+              contentType: fileMimeType,
+              upsert: true
+            });
 
-          const publicUrl = `${PUBLIC_URL}/${key}`;
-          res.status(200).json({ url: publicUrl, key });
+          if (uploadError) throw uploadError;
+
+          // 3. Get Public URL
+          const { data: urlData } = supabase.storage
+            .from("resumes")
+            .getPublicUrl(key);
+
+          const publicUrl = urlData.publicUrl;
+          res.status(200).json({ url: publicUrl, key: uploadData.path });
           resolve();
         } catch (uploadErr: any) {
-          console.error("R2 upload error:", uploadErr);
-          res.status(500).json({ message: uploadErr.message || "R2 upload failed" });
+          console.error("Supabase Storage upload error:", uploadErr);
+          res.status(500).json({ message: uploadErr.message || "Supabase Storage upload failed" });
           resolve();
         }
       });
