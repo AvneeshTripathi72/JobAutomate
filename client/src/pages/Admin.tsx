@@ -1132,6 +1132,30 @@ export default function Admin() {
   const [selectedJobSeekers, setSelectedJobSeekers] = useState<string[]>([]);
   const [isBulkEmailOpen, setIsBulkEmailOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [readNotifications, setReadNotifications] = useState<Set<string>>(() => {
+    try {
+      const stored = localStorage.getItem("tilcons_read_notifications");
+      return stored ? new Set(JSON.parse(stored)) : new Set();
+    } catch { return new Set(); }
+  });
+
+  const markAsRead = (id: string) => {
+    setReadNotifications(prev => {
+      const next = new Set(prev);
+      next.add(id);
+      localStorage.setItem("tilcons_read_notifications", JSON.stringify([...next]));
+      return next;
+    });
+  };
+
+  const markAllAsRead = (ids: string[]) => {
+    setReadNotifications(prev => {
+      const next = new Set(prev);
+      ids.forEach(id => next.add(id));
+      localStorage.setItem("tilcons_read_notifications", JSON.stringify([...next]));
+      return next;
+    });
+  };
   const [activeSeeker, setActiveSeeker] = useState<JobSeeker | null>(null);
   const [showViewer, setShowViewer] = useState(false);
   const [showAts, setShowAts] = useState(false);
@@ -1754,6 +1778,8 @@ export default function Admin() {
               }))
             ].sort((a, b) => b.time.getTime() - a.time.getTime()).slice(0, 5);
 
+            const unreadCount = list.filter(item => !readNotifications.has(item.id)).length;
+
             return (
               <div className="flex items-center gap-2 relative">
                 <div className="relative">
@@ -1765,8 +1791,10 @@ export default function Admin() {
                     data-testid="button-bell"
                   >
                     <Bell className="h-4 w-4" />
-                    {list.length > 0 && (
-                      <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] flex items-center justify-center rounded-full bg-red-500 text-white text-[10px] font-bold leading-none px-1 animate-pulse">
+                        {unreadCount}
+                      </span>
                     )}
                   </Button>
 
@@ -1777,12 +1805,22 @@ export default function Admin() {
                     >
                       <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
                         <span className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Live Activity</span>
-                        <button 
-                          onClick={() => setShowNotifications(false)}
-                          className="text-[10px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 font-medium"
-                        >
-                          Close
-                        </button>
+                        <div className="flex items-center gap-2">
+                          {unreadCount > 0 && (
+                            <button
+                              onClick={() => markAllAsRead(list.map(i => i.id))}
+                              className="text-[10px] text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+                            >
+                              Mark all read
+                            </button>
+                          )}
+                          <button 
+                            onClick={() => setShowNotifications(false)}
+                            className="text-[10px] text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 font-medium"
+                          >
+                            Close
+                          </button>
+                        </div>
                       </div>
                       <div className="divide-y divide-slate-50 dark:divide-slate-800 max-h-80 overflow-y-auto">
                         {list.length === 0 ? (
@@ -1790,19 +1828,40 @@ export default function Admin() {
                             No recent activity found.
                           </div>
                         ) : (
-                          list.map((item) => (
-                            <div key={item.id} className="px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors text-left">
-                              <div className="flex justify-between items-start gap-1.5">
-                                <p className="text-xs font-bold text-slate-800 dark:text-slate-200">{item.title}</p>
-                                <span className="text-[9px] text-slate-400 whitespace-nowrap">
-                                  {Math.max(0, Math.floor((Date.now() - item.time.getTime()) / 60000)) < 60
-                                    ? `${Math.max(1, Math.floor((Date.now() - item.time.getTime()) / 60000))}m ago`
-                                    : item.time.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
-                                </span>
+                          list.map((item) => {
+                            const isRead = readNotifications.has(item.id);
+                            return (
+                              <div 
+                                key={item.id} 
+                                className={`px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors text-left relative ${
+                                  isRead ? "opacity-60" : "bg-blue-50/50 dark:bg-blue-950/20"
+                                }`}
+                              >
+                                {!isRead && (
+                                  <span className="absolute left-1.5 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-blue-500" />
+                                )}
+                                <div className="flex justify-between items-start gap-1.5">
+                                  <p className={`text-xs font-bold ${isRead ? "text-slate-500 dark:text-slate-400" : "text-slate-800 dark:text-slate-200"}`}>{item.title}</p>
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="text-[9px] text-slate-400 whitespace-nowrap">
+                                      {Math.max(0, Math.floor((Date.now() - item.time.getTime()) / 60000)) < 60
+                                        ? `${Math.max(1, Math.floor((Date.now() - item.time.getTime()) / 60000))}m ago`
+                                        : item.time.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
+                                    </span>
+                                    {!isRead && (
+                                      <button
+                                        onClick={(e) => { e.stopPropagation(); markAsRead(item.id); }}
+                                        className="text-[9px] text-blue-500 hover:text-blue-700 dark:text-blue-400 font-medium whitespace-nowrap"
+                                      >
+                                        Read
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                                <p className={`text-[11px] mt-0.5 leading-relaxed ${isRead ? "text-slate-400 dark:text-slate-500" : "text-slate-500 dark:text-slate-400"}`}>{item.description}</p>
                               </div>
-                              <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-relaxed">{item.description}</p>
-                            </div>
-                          ))
+                            );
+                          })
                         )}
                       </div>
                     </div>
