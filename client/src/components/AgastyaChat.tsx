@@ -611,16 +611,16 @@ export default function AgastyaChat() {
       data-testid="button-open-chat"
     >
       <span
+        className="flex items-center justify-center w-full h-full rounded-full overflow-hidden"
         style={{
-          display: "inline-flex",
           transition: "transform 0.25s ease, opacity 0.2s ease",
           transform: isOpen ? "rotate(180deg) scale(0.9)" : "rotate(0deg) scale(1)",
         }}
       >
         {isOpen ? (
-          <ChevronDown className="w-6 h-6" />
+          <ChevronDown className="w-6 h-6 text-white" />
         ) : (
-          <img src="/agastya-avatar.jpg" alt="Chat" className="w-full h-full object-cover" />
+          <img src="/agastya-avatar.jpg" alt="Chat" className="w-full h-full object-cover scale-110" />
         )}
       </span>
 
