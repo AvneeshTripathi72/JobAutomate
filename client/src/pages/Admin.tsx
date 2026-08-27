@@ -1147,7 +1147,7 @@ export default function Admin() {
     setReadNotifications(prev => {
       const next = new Set(prev);
       next.add(id);
-      localStorage.setItem("tilcons_read_notifications", JSON.stringify([...next]));
+      localStorage.setItem("tilcons_read_notifications", JSON.stringify(Array.from(next)));
       return next;
     });
   };
@@ -1156,7 +1156,7 @@ export default function Admin() {
     setReadNotifications(prev => {
       const next = new Set(prev);
       ids.forEach(id => next.add(id));
-      localStorage.setItem("tilcons_read_notifications", JSON.stringify([...next]));
+      localStorage.setItem("tilcons_read_notifications", JSON.stringify(Array.from(next)));
       return next;
     });
   };

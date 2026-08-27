@@ -36,6 +36,8 @@ export const jobSeekersSchema = z.object({
   createdAt: z.date().optional(),
   isHotlisted: z.boolean().optional(),
   hotlistNotes: z.string().optional().nullable(),
+  isShortlisted: z.boolean().optional(),
+  status: z.string().optional().nullable(),
   resumeUrl: z.string().optional().nullable(),
   additionalInfo: z.string().optional().nullable(),
 });
