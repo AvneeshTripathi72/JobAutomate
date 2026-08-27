@@ -231,8 +231,8 @@ export default function AgastyaChat() {
         >
           <div className="flex items-center gap-3">
             <div className="relative">
-              <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-sky-500/20 border border-sky-500/30">
-                <Bot className="w-4 h-4 text-sky-400" />
+              <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-tr from-sky-400 to-indigo-500 shadow-md">
+                <Sparkles className="w-4 h-4 text-white animate-pulse" />
               </div>
               <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-[#0d2137]" />
             </div>
@@ -268,8 +268,8 @@ export default function AgastyaChat() {
               data-testid={`chat-message-${msg.role}-${i}`}
             >
               {msg.role === "assistant" && (
-                <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-[#0d2137] flex items-center justify-center mb-0.5">
-                  <Bot className="w-3 h-3 text-sky-400" />
+                <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-gradient-to-tr from-sky-400 to-indigo-500 shadow-sm flex items-center justify-center mb-0.5">
+                  <Sparkles className="w-3 h-3 text-white" />
                 </div>
               )}
               <div
@@ -293,8 +293,8 @@ export default function AgastyaChat() {
           {/* Typing indicator */}
           {chatMutation.isPending && (
             <div className="flex gap-2 items-end justify-start" data-testid="chat-typing-indicator">
-              <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-[#0d2137] flex items-center justify-center">
-                <Bot className="w-3 h-3 text-sky-400" />
+              <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-gradient-to-tr from-sky-400 to-indigo-500 shadow-sm flex items-center justify-center">
+                <Sparkles className="w-3 h-3 text-white animate-pulse" />
               </div>
               <div className="bg-white dark:bg-card border border-border rounded-2xl rounded-bl-sm px-3.5 py-2.5 text-sm text-muted-foreground shadow-sm flex items-center gap-1.5">
                 <TypingDots />
