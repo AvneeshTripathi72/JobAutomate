@@ -31,6 +31,7 @@ git push -u origin main
 > **🔴 IMPORTANT:** Make sure `.env` and `.env.local` are in your `.gitignore` — **never push secrets to GitHub!**
 >
 > Your `.gitignore` should include:
+>
 > ```
 > .env
 > .env.local
@@ -148,6 +149,7 @@ vercel
 ```
 
 For subsequent deploys:
+
 ```bash
 vercel          # Preview deployment
 vercel --prod   # Production deployment
@@ -163,20 +165,21 @@ vercel --prod   # Production deployment
 2. Navigate to **Settings → Environment Variables**
 3. Add each variable one by one:
 
-| Variable Name                  | Value                        | Environment    |
-|-------------------------------|------------------------------|----------------|
-| `CLOUDFLARE_ACCOUNT_ID`       | Your Cloudflare Account ID   | All            |
-| `R2_ACCESS_KEY_ID`            | Your R2 Access Key           | All            |
-| `R2_SECRET_ACCESS_KEY`        | Your R2 Secret Key           | All            |
-| `R2_BUCKET_NAME`              | `first`                      | All            |
-| `NEXT_PUBLIC_R2_PUBLIC_URL`   | Your R2 public URL           | All            |
-| `NEXT_PUBLIC_SUPABASE_URL`    | Your Supabase project URL    | All            |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase anon key     | All            |
-| `SUPABASE_SERVICE_ROLE_KEY`   | Your Supabase service role key | All          |
-| `VITE_SUPABASE_URL`           | Your Supabase project URL    | All            |
-| `VITE_SUPABASE_SERVICE_ROLE_KEY` | Your Supabase service role key | All       |
+| Variable Name                      | Value                          | Environment |
+| ---------------------------------- | ------------------------------ | ----------- |
+| `CLOUDFLARE_ACCOUNT_ID`          | Your Cloudflare Account ID     | All         |
+| `R2_ACCESS_KEY_ID`               | Your R2 Access Key             | All         |
+| `R2_SECRET_ACCESS_KEY`           | Your R2 Secret Key             | All         |
+| `R2_BUCKET_NAME`                 | `first`                      | All         |
+| `NEXT_PUBLIC_R2_PUBLIC_URL`      | Your R2 public URL             | All         |
+| `NEXT_PUBLIC_SUPABASE_URL`       | Your Supabase project URL      | All         |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY`  | Your Supabase anon key         | All         |
+| `SUPABASE_SERVICE_ROLE_KEY`      | Your Supabase service role key | All         |
+| `VITE_SUPABASE_URL`              | Your Supabase project URL      | All         |
+| `VITE_SUPABASE_SERVICE_ROLE_KEY` | Your Supabase service role key | All         |
 
 ### Via CLI:
+
 ```bash
 vercel env add CLOUDFLARE_ACCOUNT_ID
 vercel env add R2_ACCESS_KEY_ID
@@ -184,6 +187,7 @@ vercel env add R2_ACCESS_KEY_ID
 ```
 
 > **After adding env vars, redeploy:**
+>
 > ```bash
 > vercel --prod
 > ```
@@ -206,26 +210,30 @@ vercel env add R2_ACCESS_KEY_ID
 ## ⚠️ Important Notes & Limitations
 
 ### This is a Full-Stack App
+
 Your project has both a **Vite/React frontend** and an **Express backend**. Vercel is
 primarily designed for frontend + serverless functions, **not** persistent Express servers.
 
 ### What Works on Vercel (Free Tier):
-| Feature                     | Status |
-|----------------------------|--------|
-| React frontend (SPA)       | ✅ Works perfectly |
-| Client-side routing         | ✅ Works with rewrites |
-| Supabase auth & queries    | ✅ Works (runs in browser) |
-| Static assets               | ✅ Works |
-| Serverless API functions    | ✅ Works (with conversion) |
+
+| Feature                  | Status                     |
+| ------------------------ | -------------------------- |
+| React frontend (SPA)     | ✅ Works perfectly         |
+| Client-side routing      | ✅ Works with rewrites     |
+| Supabase auth & queries  | ✅ Works (runs in browser) |
+| Static assets            | ✅ Works                   |
+| Serverless API functions | ✅ Works (with conversion) |
 
 ### What Needs Extra Work:
-| Feature                     | Status |
-|----------------------------|--------|
-| Express server (`server/`) | ❌ Won't run as-is — needs serverless conversion |
-| File uploads via Express    | ⚠️ Limited to 4.5 MB — use presigned URLs instead |
-| WebSocket connections       | ❌ Not supported on Vercel serverless |
+
+| Feature                      | Status                                               |
+| ---------------------------- | ---------------------------------------------------- |
+| Express server (`server/`) | ❌ Won't run as-is — needs serverless conversion    |
+| File uploads via Express     | ⚠️ Limited to 4.5 MB — use presigned URLs instead |
+| WebSocket connections        | ❌ Not supported on Vercel serverless                |
 
 ### Quick Alternative: Frontend-Only Deploy
+
 If your frontend talks directly to **Supabase** (which it does for auth & data),
 you can deploy **just the frontend** without any backend changes:
 
@@ -238,6 +246,7 @@ you can deploy **just the frontend** without any backend changes:
 ## 🔄 Auto-Deploy on Push
 
 Once connected to GitHub, Vercel **automatically deploys** on every push:
+
 - Push to `main` → **Production deploy**
 - Push to any other branch → **Preview deploy** (with unique URL)
 
@@ -264,19 +273,20 @@ your-project/
 
 ## 🆘 Troubleshooting
 
-| Problem | Solution |
-|---------|----------|
-| Build fails | Check Node.js version — set to 20.x in Vercel project settings |
-| Page shows 404 on refresh | Make sure `rewrites` in `vercel.json` redirect to `/index.html` |
-| Env vars not working | Redeploy after adding env vars. `VITE_*` vars are baked at build time |
-| API routes return 404 | Ensure `api/` folder exists with proper serverless function exports |
-| Supabase auth fails | Verify `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are set |
+| Problem                   | Solution                                                                         |
+| ------------------------- | -------------------------------------------------------------------------------- |
+| Build fails               | Check Node.js version — set to 20.x in Vercel project settings                  |
+| Page shows 404 on refresh | Make sure`rewrites` in `vercel.json` redirect to `/index.html`             |
+| Env vars not working      | Redeploy after adding env vars.`VITE_*` vars are baked at build time           |
+| API routes return 404     | Ensure`api/` folder exists with proper serverless function exports             |
+| Supabase auth fails       | Verify`NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are set |
 
 ---
 
 ## 🧹 Cleanup (When Done Testing)
 
 To remove the Vercel deployment:
+
 1. Go to [vercel.com/dashboard](https://vercel.com/dashboard)
 2. Select your project
 3. Go to **Settings → General**
