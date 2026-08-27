@@ -391,7 +391,7 @@ export default function AgastyaChat() {
           transform: isOpen ? "rotate(180deg) scale(0.9)" : "rotate(0deg) scale(1)",
         }}
       >
-        {isOpen ? <ChevronDown className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
+        {isOpen ? <ChevronDown className="w-6 h-6" /> : <Sparkles className="w-6 h-6 text-white animate-pulse" />}
       </span>
 
       {/* Notification dot */}
