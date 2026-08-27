@@ -773,7 +773,11 @@ function ATSView({
         currentPosition: row.desired_position,
         experienceLevel: `${row.years_experience} Yrs`,
         createdAt: row.created_at ? new Date(row.created_at) : new Date(),
-        isHotlisted: false
+        isHotlisted: row.is_hotlisted ?? false,
+        isShortlisted: row.is_shortlisted ?? false,
+        additionalInfo: row.additional_info || "",
+        resumeUrl: row.resume_url || null,
+        status: row.status || "new"
       } as any));
     }
   });
@@ -1276,8 +1280,10 @@ export default function Admin() {
         experienceLevel: `${row.years_experience} Yrs`,
         createdAt: row.created_at ? new Date(row.created_at) : new Date(),
         isHotlisted: row.is_hotlisted ?? false,
+        isShortlisted: row.is_shortlisted ?? false,
         additionalInfo: row.additional_info || "",
-        resumeUrl: row.resume_url || null
+        resumeUrl: row.resume_url || null,
+        status: row.status || "new"
       } as any));
     }
   });
@@ -2597,23 +2603,34 @@ export default function Admin() {
                               <div className="w-px h-5 bg-slate-200 dark:bg-slate-700 mx-1 shrink-0" />
                               <Button 
                                 size="sm" variant="ghost" 
-                                className="h-8 text-xs font-semibold text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 hover:shadow-sm shrink-0"
+                                className={`h-8 text-xs font-semibold shrink-0 ${
+                                  seeker.isShortlisted 
+                                    ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400" 
+                                    : "text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700 hover:shadow-sm"
+                                }`}
                                 onClick={async () => {
                                   try {
+                                    const newState = !seeker.isShortlisted;
                                     const { error } = await supabase
                                       .from("resumes")
-                                      .update({ is_hotlisted: true })
+                                      .update({ is_shortlisted: newState })
                                       .eq("id", seeker.id || "");
                                     if (error) throw error;
-                                    toast({ title: "Candidate shortlisted", description: `${seeker.fullName} has been added to the shortlist.` });
+                                    toast({ 
+                                      title: newState ? "Candidate shortlisted" : "Removed from shortlist", 
+                                      description: newState 
+                                        ? `${seeker.fullName} has been added to the shortlist.` 
+                                        : `${seeker.fullName} has been removed from the shortlist.`
+                                    });
                                     queryClient.invalidateQueries({ queryKey: ["/api/admin/jobseekers"] });
                                   } catch (err) {
-                                    toast({ title: "Failed to shortlist candidate", variant: "destructive" });
+                                    toast({ title: "Failed to update shortlist", variant: "destructive" });
                                   }
                                 }}
                                 data-testid={`button-shortlist-seeker-${seeker.id || ""}`}
                               >
-                                <Star className="h-3.5 w-3.5 mr-1 fill-current" /> Shortlist
+                                <Star className={`h-3.5 w-3.5 mr-1 ${seeker.isShortlisted ? "fill-current" : ""}`} /> 
+                                {seeker.isShortlisted ? "Shortlisted" : "Shortlist"}
                               </Button>
                               <Button 
                                 size="sm" variant="ghost" 
