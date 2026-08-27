@@ -1,5 +1,4 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
-import OpenAI from "openai";
+const OpenAI = require("openai");
 
 const getClient = () => {
   const apiKey = process.env.GROQ_API_KEY || Buffer.from("Z3NrX0FXalh1eXdIZHRhbG95QWlpMVV1V0dkeWIzRllPQ3NWYWlzcDdnVVRtMjRzMWduQW5JZQ==", "base64").toString("utf-8");
@@ -9,7 +8,7 @@ const getClient = () => {
   });
 };
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+module.exports = async function handler(req, res) {
   // CORS headers
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -42,14 +41,14 @@ Keep responses concise, clear, and action-oriented. Respond in maximum 2-3 sente
 
     const formattedMessages = [
       systemPrompt,
-      ...messages.map((m: any) => ({
+      ...messages.map((m) => ({
         role: m.role === "user" ? "user" : "assistant",
         content: m.content
       }))
     ];
 
     const chatCompletion = await getClient().chat.completions.create({
-      messages: formattedMessages as any,
+      messages: formattedMessages,
       model: "llama-3.3-70b-specdec",
       temperature: 0.7,
       max_tokens: 256
@@ -58,8 +57,8 @@ Keep responses concise, clear, and action-oriented. Respond in maximum 2-3 sente
     const reply = chatCompletion.choices[0]?.message?.content || "Namaste! How can I assist you today?";
     return res.status(200).json({ reply });
 
-  } catch (err: any) {
+  } catch (err) {
     console.error("Agastya Chat Error:", err);
     return res.status(500).json({ message: err.message || "Failed to process chat request" });
   }
-}
+};

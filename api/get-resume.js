@@ -1,5 +1,4 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+const { S3Client, GetObjectCommand } = require("@aws-sdk/client-s3");
 
 const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID || "c6482e7f02a98ecdc8a0f7d2a9d14f6e";
 const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID || "f8936454ca4abdd1d726f93a611e83b6";
@@ -15,7 +14,7 @@ const r2 = new S3Client({
   },
 });
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+module.exports = async function handler(req, res) {
   // CORS headers
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
@@ -44,7 +43,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     res.setHeader("Content-Disposition", `inline; filename="${key.split("/").pop()}"`);
 
     // Stream R2 body directly to client response
-    const stream = data.Body as any;
+    const stream = data.Body;
     if (stream && typeof stream.pipe === "function") {
       stream.pipe(res);
     } else {
@@ -55,8 +54,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         throw new Error("Unable to read R2 stream body");
       }
     }
-  } catch (err: any) {
+  } catch (err) {
     console.error("R2 GetObject Error:", err);
     return res.status(404).json({ message: "Resume file not found or access denied" });
   }
-}
+};

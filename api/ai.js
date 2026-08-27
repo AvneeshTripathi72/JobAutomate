@@ -1,5 +1,4 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
-import OpenAI from "openai";
+const OpenAI = require("openai");
 
 const getClient = () => {
   const apiKey = process.env.GROQ_API_KEY || Buffer.from("Z3NrX0FXalh1eXdIZHRhbG95QWlpMVV1V0dkeWIzRllPQ3NWYWlzcDdnVVRtMjRzMWduQW5JZQ==", "base64").toString("utf-8");
@@ -9,7 +8,7 @@ const getClient = () => {
   });
 };
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+module.exports = async function handler(req, res) {
   // CORS headers
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -121,8 +120,8 @@ ${jd}`;
       return res.status(400).json({ message: "Invalid action" });
     }
 
-  } catch (err: any) {
+  } catch (err) {
     console.error("Groq AI Error:", err);
     return res.status(500).json({ message: err.message || "Failed to process AI request" });
   }
-}
+};
