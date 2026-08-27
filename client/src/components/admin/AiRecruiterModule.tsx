@@ -301,13 +301,27 @@ function ScoreCandidateForm() {
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const scoreData = scoreCandidate(candidateName, jobTitle, jdText, resumeText);
+      const response = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "score",
+          candidateName,
+          jobTitle,
+          jd: jdText,
+          resume: resumeText,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+      const scoreData = await response.json();
       try {
         const { data, error } = await supabase
           .from("ai_evaluations")
           .insert({
-            candidate_name: scoreData.candidateName,
-            job_title: scoreData.jobTitle,
+            candidate_name: scoreData.candidateName || candidateName,
+            job_title: scoreData.jobTitle || jobTitle,
             verdict: scoreData.verdict,
             overall_score: scoreData.overallScore,
             skills_score: scoreData.skillsScore,
@@ -327,9 +341,16 @@ function ScoreCandidateForm() {
         console.warn("DB insert failed, falling back to localStorage:", err);
         const local = localStorage.getItem("tilcons_evaluations");
         const list = local ? JSON.parse(local) : [];
-        list.unshift(scoreData);
+        const enriched = {
+          ...scoreData,
+          id: scoreData.id || Math.random().toString(36).substr(2, 9),
+          candidateName: scoreData.candidateName || candidateName,
+          jobTitle: scoreData.jobTitle || jobTitle,
+          createdAt: new Date(),
+        };
+        list.unshift(enriched);
         localStorage.setItem("tilcons_evaluations", JSON.stringify(list));
-        return scoreData;
+        return enriched;
       }
     },
     onSuccess: () => {
@@ -397,14 +418,28 @@ function GenerateTestForm() {
 
   const mutation = useMutation({
     mutationFn: async () => {
-      const testData = generateAssessment(jobTitle, jdText, seniority, numQuestions, durationMinutes);
+      const response = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "generate",
+          jobTitle,
+          jd: jdText,
+          seniority,
+          numQuestions,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(await response.text());
+      }
+      const testData = await response.json();
       try {
         const { data, error } = await supabase
           .from("ai_assessments")
           .insert({
-            title: testData.title,
-            seniority: testData.seniority,
-            duration_minutes: testData.durationMinutes,
+            title: testData.title || `${jobTitle} Assessment`,
+            seniority: testData.seniority || seniority,
+            duration_minutes: durationMinutes,
             questions: testData.questions,
           })
           .select();
@@ -414,9 +449,17 @@ function GenerateTestForm() {
         console.warn("DB insert failed, falling back to localStorage:", err);
         const local = localStorage.getItem("tilcons_assessments");
         const list = local ? JSON.parse(local) : [];
-        list.unshift(testData);
+        const enriched = {
+          ...testData,
+          id: testData.id || Math.random().toString(36).substr(2, 9),
+          title: testData.title || `${jobTitle} Assessment`,
+          seniority: testData.seniority || seniority,
+          durationMinutes,
+          createdAt: new Date(),
+        };
+        list.unshift(enriched);
         localStorage.setItem("tilcons_assessments", JSON.stringify(list));
-        return testData;
+        return enriched;
       }
     },
     onSuccess: () => {

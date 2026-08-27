@@ -35,6 +35,12 @@ export function ResumeViewerModal({ seeker, open, onClose, onAtsClick }: ResumeV
     toast({ title: "Link copied to clipboard" });
   };
 
+  const actualUrl = seeker.resumeUrl
+    ? (seeker.resumeUrl.startsWith("http://") || seeker.resumeUrl.startsWith("https://")
+      ? seeker.resumeUrl
+      : `https://pub-0035a50eaf1046efa85b6e5d1631f721.r2.dev/${seeker.resumeUrl.replace(/^\//, "")}`)
+    : null;
+
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className={`p-0 overflow-hidden flex flex-col transition-all duration-300 ${isFullScreen ? "max-w-full h-screen w-screen rounded-none" : "max-w-4xl h-[85vh] rounded-xl"}`}>
@@ -45,7 +51,7 @@ export function ResumeViewerModal({ seeker, open, onClose, onAtsClick }: ResumeV
             <p className="text-xs text-slate-400 truncate">{seeker.currentPosition || "Candidate"}</p>
           </div>
           <div className="flex items-center gap-2">
-            <Button size="sm" variant="ghost" className="text-slate-300 hover:text-white" onClick={() => seeker.resumeUrl && (seeker.resumeUrl.startsWith("http://") || seeker.resumeUrl.startsWith("https://")) ? window.open(seeker.resumeUrl, "_blank") : toast({ title: "No resume file uploaded yet" })}>
+            <Button size="sm" variant="ghost" className="text-slate-300 hover:text-white" onClick={() => actualUrl ? window.open(actualUrl, "_blank") : toast({ title: "No resume file uploaded yet" })}>
               <Download className="h-4 w-4 mr-1.5" /> Download
             </Button>
             <Button size="sm" className="bg-[#0ea5e9] hover:bg-[#0ea5e9]/95 text-white" onClick={onAtsClick}>
@@ -90,11 +96,11 @@ export function ResumeViewerModal({ seeker, open, onClose, onAtsClick }: ResumeV
 
         {/* Resume Content */}
         <div className="flex-1 overflow-auto bg-slate-100 dark:bg-slate-950 p-8 flex justify-center items-start">
-          {seeker.resumeUrl && (seeker.resumeUrl.startsWith("http://") || seeker.resumeUrl.startsWith("https://")) ? (
+          {actualUrl ? (
             /* Show the actual uploaded PDF/document */
             <div className="w-full h-full flex flex-col items-center" style={{ transform: `scale(${scale / 100})`, transformOrigin: "top center" }}>
               <iframe
-                src={seeker.resumeUrl}
+                src={actualUrl}
                 className="w-full bg-white rounded-lg shadow-2xl border border-slate-200 dark:border-slate-800"
                 style={{ 
                   width: "100%", 
@@ -107,7 +113,7 @@ export function ResumeViewerModal({ seeker, open, onClose, onAtsClick }: ResumeV
               <p className="text-xs text-muted-foreground mt-3">
                 If the document doesn't load,{" "}
                 <a 
-                  href={seeker.resumeUrl} 
+                  href={actualUrl} 
                   target="_blank" 
                   rel="noopener noreferrer" 
                   className="text-[#0ea5e9] hover:underline font-medium"
