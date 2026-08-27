@@ -5,7 +5,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import {
-  MessageCircle, X, Send, Bot, User, Sparkles, ChevronDown, BrainCircuit,
+  MessageCircle, X, Send, User, Sparkles, ChevronDown, BrainCircuit,
   Trash2, HelpCircle, Paperclip, Mic, ArrowRight, BookOpen, AlertCircle,
   Briefcase, FileText
 } from "lucide-react";
@@ -42,6 +42,23 @@ const STARTER_CARDS = [
     prompt: "Tell me about Tilcons CRM & ATS platform 🏢"
   }
 ];
+
+// ─── Premium Abstract AI Assistant Avatar ────────────────────────────────────
+function AgastyaAvatar({ className = "w-8 h-8" }: { className?: string }) {
+  return (
+    <div className={cn("relative flex items-center justify-center rounded-xl overflow-hidden shrink-0 shadow-sm border border-slate-200/10 dark:border-slate-800/50 bg-slate-900 select-none", className)}>
+      {/* Background elegant gradient orb with soft lighting */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-violet-600 via-indigo-600 to-cyan-500 opacity-90" />
+      {/* Soft inner glow overlay */}
+      <div className="absolute inset-[1.5px] rounded-[10px] bg-slate-950/20 backdrop-blur-[0.5px]" />
+      {/* Abstract geometric mark (4-pointed star spark / symbol) */}
+      <svg className="relative w-[55%] h-[55%] text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2v20M2 12h20" className="opacity-25" strokeWidth="1.2" />
+        <path d="M12 7l1.5 3.5 3.5 1.5-3.5 1.5-1.5 3.5-1.5-3.5-3.5-1.5 3.5-1.5 1.5-3.5z" fill="currentColor" stroke="none" />
+      </svg>
+    </div>
+  );
+}
 
 const WELCOME_MESSAGE: ChatMessage = {
   role: "assistant",
@@ -393,9 +410,7 @@ export default function AgastyaChat() {
         >
           <div className="flex items-center gap-3">
             <div className="relative">
-              <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-500 to-pink-500 shadow-md">
-                <Bot className="w-5 h-5 text-white" />
-              </div>
+              <AgastyaAvatar className="w-9 h-9" />
               <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-[#0f172a]" />
             </div>
             <div>
@@ -442,9 +457,7 @@ export default function AgastyaChat() {
           {/* Custom empty welcome state */}
           {showEmptyState ? (
             <div className="flex flex-col items-center text-center py-6 px-2 space-y-4 animate-fade-in">
-              <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-500 via-indigo-500 to-pink-500 shadow-xl shadow-purple-500/10">
-                <Bot className="w-8 h-8 text-white animate-pulse" />
-              </div>
+              <AgastyaAvatar className="w-14 h-14 rounded-2xl shadow-xl shadow-purple-500/10" />
               <div className="space-y-1">
                 <h4 className="text-base font-extrabold text-slate-800 dark:text-slate-200">Namaste! I'm Agastya</h4>
                 <p className="text-xs text-slate-500 dark:text-slate-400 max-w-[280px]">
@@ -483,9 +496,7 @@ export default function AgastyaChat() {
                   style={{ animation: "agastya-slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) both" }}
                 >
                   {!isUser && (
-                    <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-500 to-indigo-500 shadow-md flex items-center justify-center mt-0.5 select-none">
-                      <Bot className="w-4 h-4 text-white" />
-                    </div>
+                    <AgastyaAvatar className="w-8 h-8 mt-0.5" />
                   )}
                   <div
                     className={cn(
@@ -510,9 +521,7 @@ export default function AgastyaChat() {
           {/* Skeleton Shimmer Thinking Indicator */}
           {chatMutation.isPending && (
             <div className="flex gap-3 items-start justify-start animate-pulse">
-              <div className="flex-shrink-0 w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-500 to-indigo-500 shadow-md flex items-center justify-center">
-                <Bot className="w-4 h-4 text-white animate-spin" />
-              </div>
+              <AgastyaAvatar className="w-8 h-8 animate-pulse" />
               <div className="bg-white dark:bg-slate-950 border border-slate-100 dark:border-slate-900 rounded-2xl rounded-tl-sm p-4 w-[75%] space-y-2.5 shadow-sm">
                 <div className="flex items-center gap-1.5 text-xs text-purple-500 font-bold tracking-wide uppercase select-none">
                   <AlertCircle className="w-3.5 h-3.5 animate-bounce" />
@@ -618,7 +627,14 @@ export default function AgastyaChat() {
           transform: isOpen ? "rotate(180deg) scale(0.9)" : "rotate(0deg) scale(1)",
         }}
       >
-        {isOpen ? <ChevronDown className="w-6 h-6" /> : <Bot className="w-6 h-6 text-white animate-pulse" />}
+        {isOpen ? (
+          <ChevronDown className="w-6 h-6" />
+        ) : (
+          <svg className="w-6 h-6 text-white animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 2v20M2 12h20" className="opacity-40" strokeWidth="1.5" />
+            <path d="M12 5l2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5z" fill="currentColor" stroke="none" />
+          </svg>
+        )}
       </span>
 
       {showPop && !isOpen && (
