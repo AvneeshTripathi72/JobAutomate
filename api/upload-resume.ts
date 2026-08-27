@@ -1,19 +1,20 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { createClient } from "@supabase/supabase-js";
+import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://yeoavqufxojhraycowtu.supabase.co";
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "l7Mhv0iVctVmF4wcukTv1UgRouxnF39MK8dvRz_BalU"; // We extract just the signature part or use the one from env
+const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID || "c6482e7f02a98ecdc8a0f7d2a9d14f6e";
+const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID || "f8936454ca4abdd1d726f93a611e83b6";
+const R2_SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY || "32f9ac9e5b6a1132e7bdd9cce43c8af68d0ff9410d43d94903b6305fb2d1da26";
+const BUCKET = process.env.R2_BUCKET_NAME || "first";
 
-const getSupabaseClient = () => {
-  // Use service role key to ensure we can check and create buckets programmatically
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || 
-    process.env.VITE_SUPABASE_SERVICE_ROLE_KEY || 
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inllb2F2cXVmeG9qaHJheWNvd3R1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MzUwNTMxOCwiZXhwIjoyMDk5MDgxMzE4fQ.l7Mhv0iVctVmF4wcukTv1UgRouxnF39MK8dvRz_BalU";
-  
-  return createClient(supabaseUrl, key);
-};
+const r2 = new S3Client({
+  region: "auto",
+  endpoint: `https://${CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  credentials: {
+    accessKeyId: R2_ACCESS_KEY_ID,
+    secretAccessKey: R2_SECRET_ACCESS_KEY,
+  },
+});
 
-// Vercel serverless function for resume upload to Supabase Storage
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS headers
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -73,46 +74,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         }
 
         try {
-          const supabase = getSupabaseClient();
-          
-          // 1. Ensure the "resumes" bucket exists and is public
-          const { data: buckets, error: listError } = await supabase.storage.listBuckets();
-          if (listError) throw listError;
-          
-          const hasBucket = buckets?.some((b) => b.name === "resumes");
-          if (!hasBucket) {
-            const { error: createError } = await supabase.storage.createBucket("resumes", {
-              public: true,
-              fileSizeLimit: 5242880 // 5 MB
-            });
-            if (createError) throw createError;
-          }
-
-          // 2. Upload file to Supabase Storage
           const timestamp = Date.now();
           const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, "_");
-          const key = `${timestamp}_${safeName}`;
+          const key = `resumes/${timestamp}_${safeName}`;
 
-          const { data: uploadData, error: uploadError } = await supabase.storage
-            .from("resumes")
-            .upload(key, fileBuffer, {
-              contentType: fileMimeType,
-              upsert: true
-            });
+          await r2.send(
+            new PutObjectCommand({
+              Bucket: BUCKET,
+              Key: key,
+              Body: fileBuffer,
+              ContentType: fileMimeType,
+            })
+          );
 
-          if (uploadError) throw uploadError;
-
-          // 3. Get Public URL
-          const { data: urlData } = supabase.storage
-            .from("resumes")
-            .getPublicUrl(key);
-
-          const publicUrl = urlData.publicUrl;
-          res.status(200).json({ url: publicUrl, key: uploadData.path });
+          // Return proxy URL to keep the file private on R2
+          const publicUrl = `/api/get-resume?key=${key}`;
+          res.status(200).json({ url: publicUrl, key });
           resolve();
         } catch (uploadErr: any) {
-          console.error("Supabase Storage upload error:", uploadErr);
-          res.status(500).json({ message: uploadErr.message || "Supabase Storage upload failed" });
+          console.error("R2 upload error:", uploadErr);
+          res.status(500).json({ message: uploadErr.message || "R2 upload failed" });
           resolve();
         }
       });

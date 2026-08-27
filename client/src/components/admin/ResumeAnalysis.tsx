@@ -36,9 +36,9 @@ export function ResumeViewerModal({ seeker, open, onClose, onAtsClick }: ResumeV
   };
 
   const actualUrl = seeker.resumeUrl
-    ? (seeker.resumeUrl.startsWith("http://") || seeker.resumeUrl.startsWith("https://")
+    ? (seeker.resumeUrl.startsWith("http://") || seeker.resumeUrl.startsWith("https://") || seeker.resumeUrl.startsWith("/api/"))
       ? seeker.resumeUrl
-      : `https://pub-0035a50eaf1046efa85b6e5d1631f721.r2.dev/${seeker.resumeUrl.replace(/^\//, "")}`)
+      : `https://pub-0035a50eaf1046efa85b6e5d1631f721.r2.dev/${seeker.resumeUrl.replace(/^\//, "")}`
     : null;
 
   return (
