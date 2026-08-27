@@ -1,5 +1,6 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import Busboy from "busboy";
 
 const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID || "c6482e7f02a98ecdc8a0f7d2a9d14f6e";
 const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID || "f8936454ca4abdd1d726f93a611e83b6";
@@ -30,9 +31,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { default: Busboy } = await import("busboy");
-
     return new Promise<void>((resolve) => {
+      let isFinished = false;
+
       const bb = Busboy({
         headers: req.headers as Record<string, string>,
         limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
@@ -49,22 +50,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       ];
 
       bb.on("file", (_fieldname: string, file: any, info: { filename: string; mimeType: string }) => {
-        const chunks: Buffer[] = [];
-        fileName = info.filename || "resume";
-        fileMimeType = info.mimeType || "application/pdf";
+        try {
+          const chunks: Buffer[] = [];
+          fileName = info.filename || "resume";
+          fileMimeType = info.mimeType || "application/pdf";
 
-        if (!allowed.includes(fileMimeType)) {
-          file.resume();
-          return;
+          if (!allowed.includes(fileMimeType)) {
+            file.resume();
+            return;
+          }
+
+          file.on("data", (chunk: Buffer) => chunks.push(chunk));
+          file.on("end", () => {
+            fileBuffer = Buffer.concat(chunks);
+          });
+        } catch (err: any) {
+          console.error("Error in busboy file event:", err);
+          if (!isFinished) {
+            isFinished = true;
+            res.status(500).json({ message: `File event error: ${err.message}` });
+            resolve();
+          }
         }
-
-        file.on("data", (chunk: Buffer) => chunks.push(chunk));
-        file.on("end", () => {
-          fileBuffer = Buffer.concat(chunks);
-        });
       });
 
       bb.on("finish", async () => {
+        if (isFinished) return;
+        isFinished = true;
+
         if (!fileBuffer) {
           res.status(400).json({
             message: "No valid file provided. Only PDF, DOC, DOCX allowed.",
@@ -93,22 +106,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           resolve();
         } catch (uploadErr: any) {
           console.error("R2 upload error:", uploadErr);
-          res.status(500).json({ message: uploadErr.message || "R2 upload failed" });
+          res.status(500).json({ message: `R2 upload failed: ${uploadErr.message}` });
           resolve();
         }
       });
 
       bb.on("error", (err: Error) => {
         console.error("Busboy error:", err);
-        res.status(500).json({ message: "File parsing error" });
-        resolve();
+        if (!isFinished) {
+          isFinished = true;
+          res.status(500).json({ message: `Busboy error: ${err.message}` });
+          resolve();
+        }
       });
 
       req.pipe(bb);
     });
   } catch (err: any) {
     console.error("Upload handler error:", err);
-    return res.status(500).json({ message: err.message || "Upload failed" });
+    return res.status(500).json({ message: `Upload failed: ${err.message}`, stack: err.stack });
   }
 }
 
