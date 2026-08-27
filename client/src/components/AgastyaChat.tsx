@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
-  MessageCircle, X, Send, Bot, User, Sparkles, ChevronDown,
+  MessageCircle, X, Send, Bot, User, Sparkles, ChevronDown, BrainCircuit,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -365,16 +365,16 @@ export default function AgastyaChat() {
         borderRadius: "50%",
         background: isOpen
           ? "linear-gradient(135deg, #0c3555 0%, #0d2137 100%)"
-          : "linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)",
+          : "linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%)",
         boxShadow: isOpen
           ? "0 4px 20px rgba(13,33,55,0.4)"
           : showPop
-            ? "0 0 0 0 rgba(14,165,233,0.5)"
-            : "0 4px 20px rgba(14,165,233,0.35)",
+            ? "0 0 0 0 rgba(168,85,247,0.5)"
+            : "0 8px 32px rgba(168,85,247,0.4), inset 0 1px 0 rgba(255,255,255,0.25)",
+        border: isOpen ? "none" : "1px solid rgba(255,255,255,0.2)",
         animation: showPop && !isOpen ? "agastya-pulse 2s ease-in-out infinite" : undefined,
         zIndex: 2147483647,
         color: "#fff",
-        border: "none",
         cursor: "pointer",
         transform: "translateZ(0)",   // GPU layer — prevents clipping by overflow:hidden parents
         willChange: "transform",
@@ -391,7 +391,7 @@ export default function AgastyaChat() {
           transform: isOpen ? "rotate(180deg) scale(0.9)" : "rotate(0deg) scale(1)",
         }}
       >
-        {isOpen ? <ChevronDown className="w-6 h-6" /> : <Sparkles className="w-6 h-6 text-white animate-pulse" />}
+        {isOpen ? <ChevronDown className="w-6 h-6" /> : <BrainCircuit className="w-6 h-6 text-white animate-pulse" />}
       </span>
 
       {/* Notification dot */}
@@ -415,8 +415,8 @@ export default function AgastyaChat() {
           to   { opacity: 1; transform: translateY(0); }
         }
         @keyframes agastya-pulse {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(14,165,233,0.55); }
-          50%       { box-shadow: 0 0 0 14px rgba(14,165,233,0); }
+          0%, 100% { box-shadow: 0 0 0 0 rgba(168,85,247,0.55); }
+          50%       { box-shadow: 0 0 0 14px rgba(168,85,247,0); }
         }
       `}</style>
       {popBubble}
