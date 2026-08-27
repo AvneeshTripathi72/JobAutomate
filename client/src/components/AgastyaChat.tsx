@@ -46,16 +46,8 @@ const STARTER_CARDS = [
 // ─── Premium Abstract AI Assistant Avatar ────────────────────────────────────
 function AgastyaAvatar({ className = "w-8 h-8" }: { className?: string }) {
   return (
-    <div className={cn("relative flex items-center justify-center rounded-xl overflow-hidden shrink-0 shadow-sm border border-slate-200/10 dark:border-slate-800/50 bg-slate-900 select-none", className)}>
-      {/* Background elegant gradient orb with soft lighting */}
-      <div className="absolute inset-0 bg-gradient-to-tr from-violet-600 via-indigo-600 to-cyan-500 opacity-90" />
-      {/* Soft inner glow overlay */}
-      <div className="absolute inset-[1.5px] rounded-[10px] bg-slate-950/20 backdrop-blur-[0.5px]" />
-      {/* Abstract geometric mark (4-pointed star spark / symbol) */}
-      <svg className="relative w-[55%] h-[55%] text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 2v20M2 12h20" className="opacity-25" strokeWidth="1.2" />
-        <path d="M12 7l1.5 3.5 3.5 1.5-3.5 1.5-1.5 3.5-1.5-3.5-3.5-1.5 3.5-1.5 1.5-3.5z" fill="currentColor" stroke="none" />
-      </svg>
+    <div className={cn("relative flex items-center justify-center rounded-full overflow-hidden shrink-0 shadow-sm border-2 border-white bg-slate-100 select-none", className)}>
+      <img src="/agastya-avatar.jpg" alt="Agastya AI" className="w-full h-full object-cover" />
     </div>
   );
 }
@@ -600,9 +592,7 @@ export default function AgastyaChat() {
         width: "3.5rem",
         height: "3.5rem",
         borderRadius: "50%",
-        background: isOpen
-          ? "linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)"
-          : "linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%)",
+        background: isOpen ? "linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)" : "#fff",
         boxShadow: isOpen
           ? "0 4px 20px rgba(13,33,55,0.4)"
           : showPop
@@ -630,10 +620,7 @@ export default function AgastyaChat() {
         {isOpen ? (
           <ChevronDown className="w-6 h-6" />
         ) : (
-          <svg className="w-6 h-6 text-white animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 2v20M2 12h20" className="opacity-40" strokeWidth="1.5" />
-            <path d="M12 5l2 5 5 2-5 2-2 5-2-5-5-2 5-2 2-5z" fill="currentColor" stroke="none" />
-          </svg>
+          <img src="/agastya-avatar.jpg" alt="Chat" className="w-full h-full object-cover" />
         )}
       </span>
 
