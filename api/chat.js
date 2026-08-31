@@ -1,9 +1,7 @@
 const OpenAI = require("openai");
 
 const getClient = () => {
-  const p1 = "Z3NrX0FXalh1eXdIZHRhbG95QWlpMVV1V0dkeWIzRlkxT2NzVmFJ";
-  const p2 = "c3A3Z1VUbTI0czFnbkFuSWU=";
-  const apiKey = process.env.GROQ_API_KEY || Buffer.from(p1 + p2, "base64").toString("utf-8");
+  const apiKey = process.env.GROQ_API_KEY;
   return new OpenAI({
     apiKey,
     baseURL: "https://api.groq.com/openai/v1",
