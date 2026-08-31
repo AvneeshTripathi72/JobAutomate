@@ -451,11 +451,13 @@ export default function SignIn() {
               <div className="mx-auto w-14 h-14 rounded-full bg-emerald-50 flex items-center justify-center mb-3">
                 <CheckCircle2 className="h-8 w-8 text-emerald-600" />
               </div>
-              <h3 className="text-lg font-black mb-1" style={{ color: NAVY }}>Request received</h3>
-              <p className="text-sm text-muted-foreground mb-5">Our team will reach out within one business day to set up your free Tilcons workspace.</p>
-              <Button type="button" variant="outline" onClick={() => { setTrial(EMPTY_TRIAL); setAgree(false); setTrialDone(false); setTab("signin"); }} data-testid="button-back-signin">
-                Back to Sign In
-              </Button>
+              <h3 className="text-lg font-black mb-1" style={{ color: NAVY }}>Request Received</h3>
+              <p className="text-sm text-muted-foreground mb-5">Thank you for your interest! Our team will connect with you shortly to set up your Tilcons workspace.</p>
+              <Link href="/">
+                <Button type="button" className="w-full font-bold uppercase tracking-wider text-white" style={{ background: SKY }} data-testid="button-explore-website">
+                  Explore Website
+                </Button>
+              </Link>
             </div>
           ) : (
             <form onSubmit={handleTrialSubmit} className="space-y-3" data-testid="form-trial">
