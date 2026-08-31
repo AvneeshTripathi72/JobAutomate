@@ -68,7 +68,7 @@ ${resume}`;
 
       const chatCompletion = await getClient().chat.completions.create({
         messages: [{ role: "user", content: prompt }],
-        model: "llama3-8b-8192",
+        model: "groq/compound-mini",
         temperature: 0.2,
         response_format: { type: "json_object" }
       });
@@ -107,7 +107,7 @@ ${jd}`;
 
       const chatCompletion = await getClient().chat.completions.create({
         messages: [{ role: "user", content: prompt }],
-        model: "llama3-8b-8192",
+        model: "groq/compound-mini",
         temperature: 0.3,
         response_format: { type: "json_object" }
       });
