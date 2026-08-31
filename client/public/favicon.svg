@@ -1,18 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <g transform="translate(0, 10)">
-    <!-- Left Wing (Dark Blue) -->
-    <polygon points="15,10 40,10 40,30" fill="#041E42" />
-    
-    <!-- Right Wing (Light Blue) -->
-    <polygon points="60,10 80,10 95,20 80,30 60,30" fill="#0EA5E9" />
-    
-    <!-- Left Stem (Light Blue) -->
-    <polygon points="40,10 50,10 50,65 40,60" fill="#0EA5E9" />
-    
-    <!-- Right Stem (Dark Blue) -->
-    <polygon points="50,10 60,10 60,70 50,65" fill="#041E42" />
-    
-    <!-- Bottom Piece (Light Blue) -->
-    <polygon points="40,64 60,74 40,74" fill="#0EA5E9" />
-  </g>
+  <!-- Left Wing (Dark Blue) -->
+  <polygon points="10,15 33,15 33,38" fill="#0E5B94" />
+  
+  <!-- Right Wing (Orange) -->
+  <polygon points="67,15 90,15 67,38" fill="#E96B26" />
+  
+  <!-- Left Stem (Orange) -->
+  <polygon points="50,15 50,75 36,61 36,29" fill="#E96B26" />
+  
+  <!-- Right Stem (Dark Blue) -->
+  <polygon points="50,15 64,29 64,89 50,75" fill="#0E5B94" />
+  
+  <!-- Bottom Piece (Orange) -->
+  <polygon points="36,65 50,79 36,79" fill="#E96B26" />
 </svg>
