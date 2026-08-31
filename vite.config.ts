@@ -108,9 +108,41 @@ function r2UploadPlugin(): Plugin {
   };
 }
 
+function apiChatPlugin(): Plugin {
+  return {
+    name: "api-chat-plugin",
+    configureServer(server) {
+      server.middlewares.use(async (req, res, next) => {
+        if (req.method !== "POST" || req.url !== "/api/chat") {
+          return next();
+        }
+        
+        // Parse JSON body
+        let body = "";
+        req.on("data", (chunk) => { body += chunk.toString(); });
+        req.on("end", async () => {
+          try {
+            if (body) {
+              (req as any).body = JSON.parse(body);
+            }
+            // Import and run the Vercel handler
+            const chatHandler = require(path.resolve(rootDir, "api/chat.js"));
+            await chatHandler(req, res);
+          } catch (err: any) {
+            console.error("Chat handler error:", err);
+            res.writeHead(500, { "Content-Type": "application/json" });
+            res.end(JSON.stringify({ message: "Internal server error" }));
+          }
+        });
+      });
+    },
+  };
+}
+
 export default defineConfig({
   plugins: [
     r2UploadPlugin(),
+    apiChatPlugin(),
     react(),
   ],
   resolve: {
