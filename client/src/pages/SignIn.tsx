@@ -385,7 +385,7 @@ export default function SignIn() {
               <div className="p-3 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800 rounded-lg space-y-2 text-center my-3">
                 <p className="text-xs font-bold text-sky-900 dark:text-sky-200">Demo Admin Access Credentials:</p>
                 <div className="text-xs text-sky-800 dark:text-sky-300 font-mono bg-white dark:bg-slate-900 p-1.5 rounded border border-sky-200">
-                  User: <span className="font-bold">admin@tilcons.com</span> | Pass: <span className="font-bold">admin123</span>
+                  User: <span className="font-bold">{import.meta.env.VITE_BYPASS_ADMIN_USERNAME || 'admin@tilcons.com'}</span> | Pass: <span className="font-bold">{import.meta.env.VITE_BYPASS_ADMIN_PASSWORD || 'admin123'}</span>
                 </div>
                 <Button
                   type="button"
@@ -393,8 +393,15 @@ export default function SignIn() {
                   variant="outline"
                   className="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs"
                   onClick={() => {
-                    toast({ title: "Bypass Admin Login", description: "Navigating to Admin Panel..." });
-                    window.location.replace("/admin");
+                    const email = import.meta.env.VITE_BYPASS_ADMIN_USERNAME || 'admin@tilcons.com';
+                    const pass = import.meta.env.VITE_BYPASS_ADMIN_PASSWORD || 'admin123';
+                    toast({ title: "Bypass Admin Login", description: "Authenticating..." });
+                    loginMutation.mutate(
+                      { username: email, password: pass },
+                      {
+                        onSuccess: () => window.location.replace("/admin"),
+                      }
+                    );
                   }}
                   data-testid="button-demo-admin-bypass"
                 >
@@ -409,7 +416,7 @@ export default function SignIn() {
                 </div>
                 <p className="text-xs font-bold text-violet-900 dark:text-violet-200">Super Admin Access Credentials:</p>
                 <div className="text-xs text-violet-800 dark:text-violet-300 font-mono bg-white dark:bg-slate-900 p-1.5 rounded border border-violet-200">
-                  User: <span className="font-bold">superadmin@tilcons.com</span> | Pass: <span className="font-bold">super@123</span>
+                  User: <span className="font-bold">{import.meta.env.VITE_BYPASS_SUPERADMIN_USERNAME || 'superadmin@tilcons.com'}</span> | Pass: <span className="font-bold">{import.meta.env.VITE_BYPASS_SUPERADMIN_PASSWORD || 'super@123'}</span>
                 </div>
                 <Button
                   type="button"
@@ -417,8 +424,15 @@ export default function SignIn() {
                   variant="outline"
                   className="w-full bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs"
                   onClick={() => {
-                    toast({ title: "🔐 Super Admin Access", description: "Navigating to Super Admin Panel..." });
-                    window.location.replace("/super-admin");
+                    const email = import.meta.env.VITE_BYPASS_SUPERADMIN_USERNAME || 'superadmin@tilcons.com';
+                    const pass = import.meta.env.VITE_BYPASS_SUPERADMIN_PASSWORD || 'super@123';
+                    toast({ title: "🔐 Super Admin Access", description: "Authenticating..." });
+                    loginMutation.mutate(
+                      { username: email, password: pass },
+                      {
+                        onSuccess: () => window.location.replace("/super-admin"),
+                      }
+                    );
                   }}
                   data-testid="button-super-admin-bypass"
                 >
