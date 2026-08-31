@@ -103,13 +103,13 @@ export default function JobSeekerAuth() {
   const registerMutation = useMutation({
     mutationFn: async (data: InsertJobSeeker) =>
       apiRequest("POST", "/api/jobseekers/register", data),
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       toast({
         title: "Account created!",
-        description: "Your account has been created. Please login to continue.",
+        description: "Logging you in...",
       });
-      setActiveTab("login");
-      registerForm.reset();
+      // Automatically login the user after successful registration
+      loginMutation.mutate({ email: variables.email, password: variables.password });
     },
     onError: (error: any) => {
       toast({
