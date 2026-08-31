@@ -4,8 +4,9 @@ import path from "path";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import dotenv from "dotenv";
 
-// Load .env.local for server-side env vars (R2 keys)
+// Load .env.local and .env for server-side env vars (R2 keys, GROQ_API_KEY)
 dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
+dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
 const rootDir = process.cwd();
 
