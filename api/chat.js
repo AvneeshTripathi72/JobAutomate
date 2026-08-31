@@ -51,7 +51,7 @@ Keep responses concise, clear, and action-oriented. Respond in maximum 2-3 sente
 
     const chatCompletion = await getClient().chat.completions.create({
       messages: formattedMessages,
-      model: "llama-3.1-8b-instant",
+      model: "llama3-8b-8192",
       temperature: 0.7,
       max_tokens: 256
     });

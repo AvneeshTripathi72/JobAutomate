@@ -125,9 +125,21 @@ function apiChatPlugin(): Plugin {
             if (body) {
               (req as any).body = JSON.parse(body);
             }
+            
+            // Mock Vercel response methods
+            const enhancedRes = res as any;
+            enhancedRes.status = function(statusCode: number) {
+              enhancedRes.statusCode = statusCode;
+              return enhancedRes;
+            };
+            enhancedRes.json = function(data: any) {
+              enhancedRes.setHeader("Content-Type", "application/json");
+              enhancedRes.end(JSON.stringify(data));
+            };
+
             // Import and run the Vercel handler
             const chatHandler = require(path.resolve(rootDir, "api/chat.js"));
-            await chatHandler(req, res);
+            await chatHandler(req, enhancedRes);
           } catch (err: any) {
             console.error("Chat handler error:", err);
             res.writeHead(500, { "Content-Type": "application/json" });
