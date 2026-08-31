@@ -170,6 +170,7 @@ export default defineConfig({
     emptyOutDir: true,
     target: "esnext",
   },
+  envDir: rootDir,
   server: {
     fs: {
       strict: true,
