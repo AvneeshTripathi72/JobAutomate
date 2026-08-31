@@ -1,16 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <!-- Left Wing (Dark Blue) -->
-  <polygon points="10,15 33,15 33,38" fill="#0E5B94" />
-  
-  <!-- Right Wing (Orange) -->
-  <polygon points="67,15 90,15 67,38" fill="#E96B26" />
-  
-  <!-- Left Stem (Orange) -->
-  <polygon points="50,15 50,75 36,61 36,29" fill="#E96B26" />
-  
-  <!-- Right Stem (Dark Blue) -->
-  <polygon points="50,15 64,29 64,89 50,75" fill="#0E5B94" />
-  
-  <!-- Bottom Piece (Orange) -->
-  <polygon points="36,65 50,79 36,79" fill="#E96B26" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120">
+  <!-- LEFT WING - Dark Navy triangle -->
+  <polygon points="5,10 46,10 34,36" fill="#0A2647"/>
+
+  <!-- RIGHT WING - Sky Blue triangle -->
+  <polygon points="54,10 95,10 66,36" fill="#00AEEF"/>
+
+  <!-- CENTER TOP - Small dark navy triangle connecting wings -->
+  <polygon points="46,10 54,10 54,22 46,22" fill="#0A2647"/>
+
+  <!-- STEM LEFT - Sky Blue tall parallelogram -->
+  <polygon points="38,30 48,30 48,90 38,76" fill="#00AEEF"/>
+
+  <!-- STEM RIGHT - Dark Navy tall parallelogram -->
+  <polygon points="52,30 62,30 62,105 52,90" fill="#0A2647"/>
+
+  <!-- BOTTOM LEFT TRIANGLE - Sky Blue -->
+  <polygon points="38,80 48,93 38,93" fill="#00AEEF"/>
+
+  <!-- MID-LEFT ACCENT - Medium Blue diagonal strip -->
+  <polygon points="34,36 38,30 38,76 34,70" fill="#1B6FAE"/>
 </svg>
