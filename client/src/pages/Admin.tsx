@@ -234,12 +234,14 @@ const CRM_NAV_ITEMS: NavItem[] = [
   { tab: "crm", label: "Clients & Deals", icon: Building2 },
 ];
 
-// WORKSPACE_META items are injected per-role inside the Admin component
 // (use getWorkspaceMeta(role) below instead of accessing this directly)
 const _WORKSPACE_META_ATS_CRM = {
   ats: { label: "ATS", defaultTab: "ats" as AdminTab, items: ATS_NAV_ITEMS },
   crm: { label: "CRM", defaultTab: "crm" as AdminTab, items: CRM_NAV_ITEMS },
 };
+
+import JobBoardsWorkspace from "@/components/admin/JobBoardsWorkspace";
+import VmsSyncWorkspace from "@/components/admin/VmsSyncWorkspace";
 
 function getWorkspaceMeta(
   role?: string,
@@ -3043,6 +3045,12 @@ export default function Admin() {
                 )}
               </div>
             </div>
+          )}
+          {activeTab === "job-boards" && (
+            <JobBoardsWorkspace />
+          )}
+          {activeTab === "vms-sync" && (
+            <VmsSyncWorkspace />
           )}
           {/* ── Team Management ── */}
           {activeTab === "team" && (

@@ -320,3 +320,32 @@ export const aiAssessmentSchema = z.object({
 });
 export type AiAssessment = z.infer<typeof aiAssessmentSchema>;
 
+export const jobBoardPostingsSchema = z.object({
+  id: z.string().optional(),
+  jobTitle: z.string().min(1, 'Job title is required'),
+  board: z.string().min(1, 'Board is required'),
+  status: z.string().default('Pending'),
+  applicantsCount: z.number().int().min(0).default(0),
+  externalUrl: z.string().optional().nullable(),
+  postedAt: z.date().optional().nullable(),
+  ownerUserId: z.string().optional().nullable(),
+  createdAt: z.date().optional(),
+});
+export const insertJobBoardPostingSchema = jobBoardPostingsSchema.omit({ id: true, createdAt: true, ownerUserId: true });
+export type JobBoardPosting = z.infer<typeof jobBoardPostingsSchema>;
+export type InsertJobBoardPosting = z.infer<typeof insertJobBoardPostingSchema>;
+
+export const vmsConnectionsSchema = z.object({
+  id: z.string().optional(),
+  systemName: z.string().min(1, 'System name is required'),
+  clientName: z.string().min(1, 'Client name is required'),
+  status: z.string().default('Pending'),
+  syncedRecords: z.number().int().min(0).default(0),
+  lastSyncAt: z.date().optional().nullable(),
+  notes: z.string().optional().nullable(),
+  ownerUserId: z.string().optional().nullable(),
+  createdAt: z.date().optional(),
+});
+export const insertVmsConnectionSchema = vmsConnectionsSchema.omit({ id: true, createdAt: true, ownerUserId: true });
+export type VmsConnection = z.infer<typeof vmsConnectionsSchema>;
+export type InsertVmsConnection = z.infer<typeof insertVmsConnectionSchema>;

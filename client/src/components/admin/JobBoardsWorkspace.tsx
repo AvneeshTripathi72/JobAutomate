@@ -104,6 +104,8 @@ function BoardFormFields({ form, setForm }: { form: BoardForm; setForm: (f: Boar
   );
 }
 
+import { supabase } from "@/lib/supabase";
+
 function NewBoardDialog() {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
@@ -111,8 +113,16 @@ function NewBoardDialog() {
 
   const mutation = useMutation({
     mutationFn: async (data: BoardForm) => {
-      const res = await apiRequest("POST", "/api/job-board-postings", { ...data, postedAt: data.status === "Live" ? new Date().toISOString() : null });
-      return res.json();
+      const { data: res, error } = await supabase.from('job_board_postings').insert({
+        job_title: data.jobTitle,
+        board: data.board,
+        status: data.status,
+        applicants_count: data.applicantsCount,
+        external_url: data.externalUrl,
+        posted_at: data.status === "Live" ? new Date().toISOString() : null
+      });
+      if (error) throw error;
+      return res;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/job-board-postings"] });
@@ -162,11 +172,16 @@ function EditBoardDialog({ item, onClose }: { item: JobBoardPosting; onClose: ()
 
   const mutation = useMutation({
     mutationFn: async (data: BoardForm) => {
-      const res = await apiRequest("PATCH", `/api/job-board-postings/${item.id}`, {
-        ...data,
-        postedAt: data.status === "Live" ? (item.postedAt ?? new Date().toISOString()) : item.postedAt,
-      });
-      return res.json();
+      const { data: res, error } = await supabase.from('job_board_postings').update({
+        job_title: data.jobTitle,
+        board: data.board,
+        status: data.status,
+        applicants_count: data.applicantsCount,
+        external_url: data.externalUrl,
+        posted_at: data.status === "Live" ? (item.postedAt ?? new Date().toISOString()) : item.postedAt,
+      }).eq('id', item.id);
+      if (error) throw error;
+      return res;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/job-board-postings"] });
@@ -200,11 +215,29 @@ function EditBoardDialog({ item, onClose }: { item: JobBoardPosting; onClose: ()
 
 export default function JobBoardsWorkspace() {
   const { toast } = useToast();
-  const { data: postings = [], isLoading } = useQuery<JobBoardPosting[]>({ queryKey: ["/api/job-board-postings"] });
+  const { data: postings = [], isLoading } = useQuery<JobBoardPosting[]>({ 
+    queryKey: ["/api/job-board-postings"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('job_board_postings').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      return (data || []).map(row => ({
+        id: row.id,
+        jobTitle: row.job_title,
+        board: row.board,
+        status: row.status,
+        applicantsCount: row.applicants_count,
+        externalUrl: row.external_url,
+        postedAt: row.posted_at ? new Date(row.posted_at) : undefined,
+      } as JobBoardPosting));
+    }
+  });
   const [editingItem, setEditingItem] = useState<JobBoardPosting | null>(null);
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: string) => apiRequest("DELETE", `/api/job-board-postings/${id}`),
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('job_board_postings').delete().eq('id', id);
+      if (error) throw error;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/job-board-postings"] });
       toast({ title: "Posting removed" });

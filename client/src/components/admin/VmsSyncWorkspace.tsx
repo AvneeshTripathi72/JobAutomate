@@ -102,6 +102,8 @@ function VmsFormFields({ form, setForm }: { form: VmsForm; setForm: (f: VmsForm)
   );
 }
 
+import { supabase } from "@/lib/supabase";
+
 function NewVmsDialog() {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
@@ -109,8 +111,16 @@ function NewVmsDialog() {
 
   const mutation = useMutation({
     mutationFn: async (data: VmsForm) => {
-      const res = await apiRequest("POST", "/api/vms-connections", { ...data, lastSyncAt: data.status === "Connected" ? new Date().toISOString() : null });
-      return res.json();
+      const { data: res, error } = await supabase.from('vms_connections').insert({
+        system_name: data.systemName,
+        client_name: data.clientName,
+        status: data.status,
+        synced_records: data.syncedRecords,
+        notes: data.notes,
+        last_sync_at: data.status === "Connected" ? new Date().toISOString() : null
+      });
+      if (error) throw error;
+      return res;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/vms-connections"] });
@@ -160,11 +170,16 @@ function EditVmsDialog({ item, onClose }: { item: VmsConnection; onClose: () => 
 
   const mutation = useMutation({
     mutationFn: async (data: VmsForm) => {
-      const res = await apiRequest("PATCH", `/api/vms-connections/${item.id}`, {
-        ...data,
-        lastSyncAt: data.status === "Connected" ? new Date().toISOString() : item.lastSyncAt,
-      });
-      return res.json();
+      const { data: res, error } = await supabase.from('vms_connections').update({
+        system_name: data.systemName,
+        client_name: data.clientName,
+        status: data.status,
+        synced_records: data.syncedRecords,
+        notes: data.notes,
+        last_sync_at: data.status === "Connected" ? new Date().toISOString() : item.lastSyncAt,
+      }).eq('id', item.id);
+      if (error) throw error;
+      return res;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/vms-connections"] });
@@ -198,11 +213,29 @@ function EditVmsDialog({ item, onClose }: { item: VmsConnection; onClose: () => 
 
 export default function VmsSyncWorkspace() {
   const { toast } = useToast();
-  const { data: connections = [], isLoading } = useQuery<VmsConnection[]>({ queryKey: ["/api/vms-connections"] });
+  const { data: connections = [], isLoading } = useQuery<VmsConnection[]>({ 
+    queryKey: ["/api/vms-connections"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('vms_connections').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      return (data || []).map(row => ({
+        id: row.id,
+        systemName: row.system_name,
+        clientName: row.client_name,
+        status: row.status,
+        syncedRecords: row.synced_records,
+        notes: row.notes,
+        lastSyncAt: row.last_sync_at ? new Date(row.last_sync_at) : undefined,
+      } as VmsConnection));
+    }
+  });
   const [editingItem, setEditingItem] = useState<VmsConnection | null>(null);
 
   const deleteMutation = useMutation({
-    mutationFn: async (id: string) => apiRequest("DELETE", `/api/vms-connections/${id}`),
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('vms_connections').delete().eq('id', id);
+      if (error) throw error;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/vms-connections"] });
       toast({ title: "Connection removed" });
