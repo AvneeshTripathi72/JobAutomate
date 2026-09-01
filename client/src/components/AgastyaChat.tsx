@@ -285,7 +285,7 @@ Keep responses concise, clear, and action-oriented. Respond in maximum 2-3 sente
         },
         body: JSON.stringify({
           messages: formattedMessages,
-          model: "llama-3.1-8b-instant",
+          model: "qwen/qwen3.8-27b",
           temperature: 0.7,
           max_tokens: 256
         })
