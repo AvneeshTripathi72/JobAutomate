@@ -307,7 +307,7 @@ export default function VmsSyncWorkspace() {
                     <Button size="icon" variant="ghost" onClick={() => setEditingItem(c)}>
                       <Pencil className="h-4 w-4 text-muted-foreground" />
                     </Button>
-                    <Button size="icon" variant="ghost" onClick={() => { if (confirm("Delete this connection?")) deleteMutation.mutate(c.id); }}>
+                    <Button size="icon" variant="ghost" onClick={() => { if (confirm("Delete this integration?")) deleteMutation.mutate(c.id!); }}>
                       <Trash2 className="h-4 w-4 text-muted-foreground" />
                     </Button>
                   </div>

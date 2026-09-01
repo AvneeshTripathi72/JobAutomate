@@ -255,11 +255,45 @@ export default function AgastyaChat() {
   }, [streamingIndex, streamingText]);
 
   const chatMutation = useMutation({
-    mutationFn: async (userMessage: string) => {
+      mutationFn: async (userMessage: string) => {
       setStatusText("Thinking");
       const newMessages = [...messages, { role: "user" as const, content: userMessage }];
-      const res = await apiRequest("POST", "/api/chat", { messages: newMessages });
-      return res.json();
+      
+      const systemPrompt = {
+        role: "system",
+        content: `You are Agastya, the dedicated recruitment assistant at Tilcons. 
+Tilcons is a leading ATS + CRM platform for staffing agencies and recruiters in India.
+Your tone should be helpful, warm ("Namaste!"), professional, and recruitment-oriented.
+Help candidates with queries about submitting resumes, checking positions, or how Tilcons assists them.
+Help employers/clients understand Tilcons features like AI Resume Screening, JD-to-Test MCQ Generation, ATS, CRM pipeline, background checks, and automated scheduling.
+Keep responses concise, clear, and action-oriented. Respond in maximum 2-3 sentences where possible to keep it conversational. Do not use markdown headers.`
+      };
+
+      const formattedMessages = [
+        systemPrompt,
+        ...newMessages.map((m) => ({
+          role: m.role === "user" ? "user" : "assistant",
+          content: m.content
+        }))
+      ];
+
+      const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`
+        },
+        body: JSON.stringify({
+          messages: formattedMessages,
+          model: "llama-3.1-8b-instant",
+          temperature: 0.7,
+          max_tokens: 256
+        })
+      });
+
+      if (!res.ok) throw new Error("API Error");
+      const data = await res.json();
+      return { reply: data.choices[0]?.message?.content || "Namaste! How can I assist you today?" };
     },
     onMutate: (userMessage: string) => {
       setMessages((prev) => [...prev, { role: "user", content: userMessage }]);

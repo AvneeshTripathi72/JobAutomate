@@ -75,23 +75,37 @@ export default function SubmitResume() {
   const [resumeFile, setResumeFile] = useState<File | null>(null);
 
   // Helper: upload file to Cloudflare R2 via server API and return a public URL
+  // Helper: upload file to Cloudflare R2 via AWS SDK directly from frontend
   const uploadResumeToStorage = async (file: File): Promise<string | null> => {
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-
-      const response = await fetch("/api/upload-resume", {
-        method: "POST",
-        body: formData,
+      const { S3Client, PutObjectCommand } = await import("@aws-sdk/client-s3");
+      
+      const r2 = new S3Client({
+        region: "auto",
+        endpoint: `https://${import.meta.env.VITE_CLOUDFLARE_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+        credentials: {
+          accessKeyId: import.meta.env.VITE_R2_ACCESS_KEY_ID || "",
+          secretAccessKey: import.meta.env.VITE_R2_SECRET_ACCESS_KEY || "",
+        },
       });
 
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({ message: "Upload failed" }));
-        throw new Error(err.message || "Upload failed");
-      }
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2, 15)}_${Date.now()}.${fileExt}`;
+      
+      // Convert File to ArrayBuffer for AWS SDK
+      const arrayBuffer = await file.arrayBuffer();
 
-      const result = await response.json();
-      return result.url || null;
+      await r2.send(
+        new PutObjectCommand({
+          Bucket: import.meta.env.VITE_R2_BUCKET_NAME || "first",
+          Key: fileName,
+          Body: new Uint8Array(arrayBuffer),
+          ContentType: file.type || "application/pdf",
+        })
+      );
+
+      const publicUrl = `${import.meta.env.VITE_NEXT_PUBLIC_R2_PUBLIC_URL}/${fileName}`;
+      return publicUrl;
     } catch (err: any) {
       console.error("Resume upload failed:", err);
       toast({

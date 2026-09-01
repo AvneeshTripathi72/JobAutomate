@@ -313,7 +313,7 @@ export default function JobBoardsWorkspace() {
                     <Button size="icon" variant="ghost" onClick={() => setEditingItem(p)}>
                       <Pencil className="h-4 w-4 text-muted-foreground" />
                     </Button>
-                    <Button size="icon" variant="ghost" onClick={() => { if (confirm("Delete this posting?")) deleteMutation.mutate(p.id); }}>
+                    <Button size="icon" variant="ghost" onClick={() => { if (confirm("Delete this posting?")) deleteMutation.mutate(p.id!); }}>
                       <Trash2 className="h-4 w-4 text-muted-foreground" />
                     </Button>
                   </div>
