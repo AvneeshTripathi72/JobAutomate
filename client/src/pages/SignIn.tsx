@@ -91,9 +91,11 @@ export default function SignIn() {
   const { toast } = useToast();
   const { user, loginMutation } = useAuth();
 
+  // Redirect if already logged in
   useEffect(() => {
     if (user) {
-      const dest = (user as any).role === "super_admin" ? "/super-admin" : "/admin";
+      const isSuperAdmin = (user as any).email === import.meta.env.VITE_BYPASS_SUPERADMIN_USERNAME || (user as any).email === "superadmin@tilcons.com" || (user as any).role === "super_admin";
+      const dest = isSuperAdmin ? "/super-admin" : "/admin";
       window.location.replace(dest);
     }
   }, [user]);
