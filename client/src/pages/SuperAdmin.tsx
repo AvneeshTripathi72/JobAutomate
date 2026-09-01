@@ -321,11 +321,11 @@ export default function SuperAdmin() {
               <p className="text-white/40 text-[10px]">Super Admin</p>
             </div>
           </div>
-          <button
-            onClick={() => logoutMutation.mutate()}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-white/50 hover:text-white hover:bg-white/8 text-sm transition-all"
-            data-testid="button-super-logout"
-          >
+            <button
+              onClick={() => logoutMutation.mutate(undefined, { onSuccess: () => window.location.replace("/signin") })}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-white/50 hover:text-white hover:bg-white/8 text-sm transition-all"
+              data-testid="button-super-logout"
+            >
             <LogOut className="h-4 w-4" /> Logout
           </button>
         </div>

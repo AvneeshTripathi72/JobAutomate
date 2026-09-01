@@ -1354,7 +1354,7 @@ export default function Admin() {
   });
 
   const handleLogout = () => {
-    logoutMutation.mutate(undefined, { onSuccess: () => setLocation("/auth") });
+    logoutMutation.mutate(undefined, { onSuccess: () => window.location.replace("/signin") });
   };
 
   const createMutation = useMutation({
